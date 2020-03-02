@@ -316,185 +316,172 @@ class _HabitScreenState extends State<HabitScreen> {
       _isInit = true;
     }
 
-    return Theme(
-      data: ThemeData(
-        scaffoldBackgroundColor: TodoColors.scaffoldWhite,
-      ),
-      child: Scaffold(
-        resizeToAvoidBottomPadding: false,
-        appBar: AppBar(
-          title: Text(
-            'Doing task',
-            style: TextStyle(
-              fontFamily: 'Montserrat',
-            ),
+    return Scaffold(
+      resizeToAvoidBottomPadding: false,
+      appBar: AppBar(
+        title: Text(
+          'Doing task',
+          style: TextStyle(
+            fontFamily: 'Montserrat',
           ),
-          centerTitle: true,
-          backgroundColor: Color(int.parse(colors[widget.habit.color])),
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back),
-            onPressed: () {
-              _onBackPress();
-            },
-          ),
-          actions: <Widget>[
-            _timerState != TimerState.DONE
-                ? IconButton(
-                    icon: Icon(Icons.delete),
-                    onPressed: () async {
-                      await _buildDeleteCheckDialog(context);
-                    },
-                  )
-                : IconButton(
-                    icon: Icon(Icons.check),
-                    onPressed: () async {
-                      _habitBloc.event.add(
-                        DeleteHabitEvent(
-                          habit: widget.habit,
-                        ),
-                      );
-                      Navigator.pop(context);
-                    },
-                  ),
-            IconButton(
-              icon: Icon(getIconUsingPrefix(name: icons[_iconIndex])),
-              onPressed: () {
-                _buildIconPicker(context);
-              },
-            ),
-          ],
         ),
-        body: WillPopScope(
-          onWillPop: () {
+        centerTitle: true,
+        backgroundColor: Color(int.parse(colors[widget.habit.color])),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
             _onBackPress();
           },
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              Flexible(
-                flex: 5,
-                child: Column(
-                  children: <Widget>[
-                    SizedBox(height: 15),
-                    Text(
-                      '${widget.habit.habitName}',
-                      style: TextStyle(
-                        fontFamily: 'Alata',
-                        fontSize: MediaQuery.of(context).size.width / 25,
+        ),
+        actions: <Widget>[
+          _timerState != TimerState.DONE
+              ? IconButton(
+                  icon: Icon(Icons.delete),
+                  onPressed: () async {
+                    await _buildDeleteCheckDialog(context);
+                  },
+                )
+              : IconButton(
+                  icon: Icon(Icons.check),
+                  onPressed: () async {
+                    _habitBloc.event.add(
+                      DeleteHabitEvent(
+                        habit: widget.habit,
                       ),
+                    );
+                    Navigator.pop(context);
+                  },
+                ),
+          IconButton(
+            icon: Icon(getIconUsingPrefix(name: icons[_iconIndex])),
+            onPressed: () {
+              _buildIconPicker(context);
+            },
+          ),
+        ],
+      ),
+      body: WillPopScope(
+        onWillPop: () {
+          _onBackPress();
+        },
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            Flexible(
+              flex: 5,
+              child: Column(
+                children: <Widget>[
+                  SizedBox(height: 15),
+                  Text(
+                    '${widget.habit.habitName}',
+                    style: TextStyle(
+                      fontFamily: 'Alata',
+                      fontSize: MediaQuery.of(context).size.width / 25,
                     ),
-                    countdownClock,
-                    SizedBox(height: 20),
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: <Widget>[
-                        SleekCircularSlider(
-                          appearance: CircularSliderAppearance(
-                            animationEnabled: true,
-                            angleRange: 360,
-                            startAngle: 270,
-                            customWidths: CustomSliderWidths(
-                              progressBarWidth: 8,
-                              handlerSize: 0,
-                              shadowWidth: 0,
-                            ),
-                            customColors: CustomSliderColors(
-                              dotColor:
-                                  Color(int.parse(colors[widget.habit.color])),
-                              progressBarColor:
-                                  Color(int.parse(colors[widget.habit.color])),
-                              trackColor: Colors.white,
-                            ),
-                            size:
-                                (MediaQuery.of(context).size.height - 24) / 3.5,
+                  ),
+                  countdownClock,
+                  SizedBox(height: 20),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: <Widget>[
+                      SleekCircularSlider(
+                        appearance: CircularSliderAppearance(
+                          animationEnabled: true,
+                          angleRange: 360,
+                          startAngle: 270,
+                          customWidths: CustomSliderWidths(
+                            progressBarWidth: 8,
+                            handlerSize: 0,
+                            shadowWidth: 0,
                           ),
-                          initialValue: _percent.toDouble(),
-                          min: 0,
-                          max: _maxTimer.toDouble(),
-                          innerWidget: (percentage) {
-                            return Center(
-                              child: GestureDetector(
-                                onTap: () {
-                                  if (Platform.isIOS) {
-                                    setState(() {
-                                      if (_timerState == TimerState.PLAY) {
-                                        _timerState = TimerState.PAUSE;
-                                        countdownClock.onPause =
-                                            !countdownClock.onPause;
-                                      } else if (_timerState ==
-                                          TimerState.PAUSE) {
-                                        _timerState = TimerState.PLAY;
-                                        countdownClock.onPause =
-                                            !countdownClock.onPause;
-                                      }
-                                    });
-                                  }
-                                },
-                                child: Container(
-                                  width: (MediaQuery.of(context).size.height -
-                                              24) /
-                                          3.5 -
-                                      20,
-                                  height: (MediaQuery.of(context).size.height -
-                                              24) /
-                                          3.5 -
-                                      20,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(160),
-                                    color: Colors.white,
-                                  ),
-                                  child: Center(
-                                    child: _widgetInCircle(),
-                                  ),
+                          customColors: CustomSliderColors(
+                            dotColor:
+                                Color(int.parse(colors[widget.habit.color])),
+                            progressBarColor:
+                                Color(int.parse(colors[widget.habit.color])),
+                            trackColor: Colors.white,
+                          ),
+                          size: (MediaQuery.of(context).size.height - 24) / 3.5,
+                        ),
+                        initialValue: _percent.toDouble(),
+                        min: 0,
+                        max: _maxTimer.toDouble(),
+                        innerWidget: (percentage) {
+                          return Center(
+                            child: GestureDetector(
+                              onTap: () {
+                                if (Platform.isIOS) {
+                                  setState(() {
+                                    if (_timerState == TimerState.PLAY) {
+                                      _timerState = TimerState.PAUSE;
+                                      countdownClock.onPause =
+                                          !countdownClock.onPause;
+                                    } else if (_timerState ==
+                                        TimerState.PAUSE) {
+                                      _timerState = TimerState.PLAY;
+                                      countdownClock.onPause =
+                                          !countdownClock.onPause;
+                                    }
+                                  });
+                                }
+                              },
+                              child: Container(
+                                width:
+                                    (MediaQuery.of(context).size.height - 24) /
+                                            3.5 -
+                                        20,
+                                height:
+                                    (MediaQuery.of(context).size.height - 24) /
+                                            3.5 -
+                                        20,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(160),
+                                  color: Colors.white,
+                                ),
+                                child: Center(
+                                  child: _widgetInCircle(),
                                 ),
                               ),
-                            );
-                          },
-                        ),
-                      ],
-                    ),
-                    if (_achievelists.length != 0)
-                      Flexible(
-                        flex: 2,
-                        child: ListView.builder(
-                          physics: BouncingScrollPhysics(),
-                          scrollDirection: Axis.horizontal,
-                          itemCount: _achievelists.length + 1,
-                          itemBuilder: (context, index) {
-                            if (index < _achievelists.length)
-                              return _buildAchieveTile(index);
-                            else {
-                              return _buildAddAchieve();
-                            }
-                          },
-                        ),
+                            ),
+                          );
+                        },
                       ),
-                  ],
-                ),
+                    ],
+                  ),
+                  if (_achievelists.length != 0)
+                    Flexible(
+                      flex: 2,
+                      child: ListView.builder(
+                        physics: BouncingScrollPhysics(),
+                        scrollDirection: Axis.horizontal,
+                        itemCount: _achievelists.length + 1,
+                        itemBuilder: (context, index) {
+                          if (index < _achievelists.length)
+                            return _buildAchieveTile(index);
+                          else {
+                            return _buildAddAchieve();
+                          }
+                        },
+                      ),
+                    ),
+                ],
               ),
-              Column(
-                children: <Widget>[
-                  SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    physics: BouncingScrollPhysics(),
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 5.0),
-                      child: Row(
-                        children: List.generate(
-                          _catagoryItems.length,
-                          (index) => Container(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              border: Border.all(
-                                color: _catagoryItems[index] == false
-                                    ? Color(
-                                        int.parse(
-                                          colors[widget.habit.color],
-                                        ),
-                                      )
-                                    : Colors.white,
-                              ),
-                              color: _catagoryItems[index]
+            ),
+            Column(
+              children: <Widget>[
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  physics: BouncingScrollPhysics(),
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 5.0),
+                    child: Row(
+                      children: List.generate(
+                        _catagoryItems.length,
+                        (index) => Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(
+                              color: _catagoryItems[index] == false
                                   ? Color(
                                       int.parse(
                                         colors[widget.habit.color],
@@ -502,23 +489,42 @@ class _HabitScreenState extends State<HabitScreen> {
                                     )
                                   : Colors.white,
                             ),
-                            padding: const EdgeInsets.all(8),
-                            margin: const EdgeInsets.only(
-                              right: 5,
-                            ),
-                            child: FittedBox(
-                              child: InkWell(
-                                onTap: () {
-                                  setState(() {
-                                    _catagoryItems[index] =
-                                        !_catagoryItems[index];
-                                  });
-                                },
-                                child: Row(
-                                  children: <Widget>[
-                                    Icon(
-                                      catagoryIcons[index],
-                                      size: 15,
+                            color: _catagoryItems[index]
+                                ? Color(
+                                    int.parse(
+                                      colors[widget.habit.color],
+                                    ),
+                                  )
+                                : Colors.white,
+                          ),
+                          padding: const EdgeInsets.all(8),
+                          margin: const EdgeInsets.only(
+                            right: 5,
+                          ),
+                          child: FittedBox(
+                            child: InkWell(
+                              onTap: () {
+                                setState(() {
+                                  _catagoryItems[index] =
+                                      !_catagoryItems[index];
+                                });
+                              },
+                              child: Row(
+                                children: <Widget>[
+                                  Icon(
+                                    catagoryIcons[index],
+                                    size: 15,
+                                    color: _catagoryItems[index] == false
+                                        ? Color(
+                                            int.parse(
+                                              colors[widget.habit.color],
+                                            ),
+                                          )
+                                        : Colors.white,
+                                  ),
+                                  Text(
+                                    ' ${catagories[index]}',
+                                    style: TextStyle(
                                       color: _catagoryItems[index] == false
                                           ? Color(
                                               int.parse(
@@ -527,20 +533,8 @@ class _HabitScreenState extends State<HabitScreen> {
                                             )
                                           : Colors.white,
                                     ),
-                                    Text(
-                                      ' ${catagories[index]}',
-                                      style: TextStyle(
-                                        color: _catagoryItems[index] == false
-                                            ? Color(
-                                                int.parse(
-                                                  colors[widget.habit.color],
-                                                ),
-                                              )
-                                            : Colors.white,
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                                  ),
+                                ],
                               ),
                             ),
                           ),
@@ -548,78 +542,75 @@ class _HabitScreenState extends State<HabitScreen> {
                       ),
                     ),
                   ),
-                  Container(
-                    height: 50,
-                    width: MediaQuery.of(context).size.width,
-                    margin: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-                    child: Center(
-                      child: Row(
-                        children: <Widget>[
-                          Expanded(
+                ),
+                Container(
+                  height: 50,
+                  width: MediaQuery.of(context).size.width,
+                  margin: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                  child: Center(
+                    child: Row(
+                      children: <Widget>[
+                        Expanded(
+                          child: Container(
+                            margin: EdgeInsets.only(right: 10),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(
+                                color: Color(
+                                    int.parse(colors[widget.habit.color])),
+                                width: 1,
+                              ),
+                            ),
+                            child: TextField(
+                              focusNode: myFocusNode,
+                              decoration: InputDecoration(
+                                contentPadding: EdgeInsets.all(10),
+                                labelText: 'Achieve goal',
+                                labelStyle: TextStyle(
+                                  fontFamily: 'Alata',
+                                  color: Colors.grey,
+                                  fontSize: 16,
+                                ),
+                                border: InputBorder.none,
+                              ),
+                              controller: _achieveTextController,
+                            ),
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            if (_achieveTextController.text != '' &&
+                                _achieveTextController != null) {
+                              FocusScope.of(context).requestFocus(FocusNode());
+                              setState(() {
+                                _achievelists.add(_achieveTextController.text
+                                    .replaceAll(RegExp(r','), ' '));
+                                _isDoneAchieve.add(false);
+                                _achieveTextController.clear();
+                              });
+                            }
+                          },
+                          child: Material(
+                            elevation: 1,
+                            color: Color(int.parse(colors[widget.habit.color])),
+                            borderRadius: BorderRadiusDirectional.circular(10),
                             child: Container(
-                              margin: EdgeInsets.only(right: 10),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                border: Border.all(
-                                  color: Color(
-                                      int.parse(colors[widget.habit.color])),
-                                  width: 1,
-                                ),
-                              ),
-                              child: TextField(
-                                focusNode: myFocusNode,
-                                decoration: InputDecoration(
-                                  contentPadding: EdgeInsets.all(10),
-                                  labelText: 'Achieve goal',
-                                  labelStyle: TextStyle(
-                                    fontFamily: 'Alata',
-                                    color: Colors.grey,
-                                    fontSize: 16,
-                                  ),
-                                  border: InputBorder.none,
-                                ),
-                                controller: _achieveTextController,
+                              height: 40,
+                              width: 40,
+                              child: Icon(
+                                Ionicons.ios_add,
+                                color: Colors.white,
                               ),
                             ),
                           ),
-                          GestureDetector(
-                            onTap: () {
-                              if (_achieveTextController.text != '' &&
-                                  _achieveTextController != null) {
-                                FocusScope.of(context)
-                                    .requestFocus(FocusNode());
-                                setState(() {
-                                  _achievelists.add(_achieveTextController.text
-                                      .replaceAll(RegExp(r','), ' '));
-                                  _isDoneAchieve.add(false);
-                                  _achieveTextController.clear();
-                                });
-                              }
-                            },
-                            child: Material(
-                              elevation: 1,
-                              color:
-                                  Color(int.parse(colors[widget.habit.color])),
-                              borderRadius:
-                                  BorderRadiusDirectional.circular(10),
-                              child: Container(
-                                height: 40,
-                                width: 40,
-                                child: Icon(
-                                  Ionicons.ios_add,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
-                ],
-              ),
-            ],
-          ),
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );

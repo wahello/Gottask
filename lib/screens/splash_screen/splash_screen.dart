@@ -44,10 +44,8 @@ class _SplashScreenState extends State<SplashScreen>
                         ],
                         color: TodoColors.deepPurple,
                       ),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Color(0xFFF6F5F4),
-                        ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(15),
                         child: Image.asset(
                           splashScreen[pos],
                           fit: BoxFit.contain,
@@ -78,23 +76,43 @@ class _SplashScreenState extends State<SplashScreen>
                           activeDotColor: TodoColors.deepPurple,
                         ),
                       )
-                    : RaisedButton(
-                        onPressed: () async {
-                          if (widget.isInit == null) {
-                            await updateStartState();
-                            Navigator.popAndPushNamed(context, '/config');
-                          } else {
-                            Navigator.pop(context);
-                          }
-                        },
-                        child: Text(
-                          widget.isInit == null ? 'Let\'s go!' : 'Go back!',
-                          style: TextStyle(
-                            fontFamily: 'Alata',
-                            color: Colors.white,
+                    : Material(
+                        borderRadius: BorderRadius.circular(15),
+                        child: InkWell(
+                              borderRadius: BorderRadius.circular(15),
+                          onTap: () async {
+                            if (widget.isInit == null) {
+                              await updateStartState();
+                              Navigator.popAndPushNamed(context, '/config');
+                            } else {
+                              Navigator.pop(context);
+                            }
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 10,
+                              horizontal: 25,
+                            ),
+                            decoration: BoxDecoration(
+                              color: TodoColors.deepPurple,
+                              borderRadius: BorderRadius.circular(15),
+                              boxShadow: [
+                                BoxShadow(
+                                  blurRadius: 4,
+                                  spreadRadius: 1,
+                                  color: TodoColors.deepPurple.withOpacity(0.5),
+                                ),
+                              ],
+                            ),
+                            child: Text(
+                              widget.isInit == null ? 'Let\'s go!' : 'Go back',
+                              style: TextStyle(
+                                fontFamily: 'Alata',
+                                color: Colors.white,
+                              ),
+                            ),
                           ),
                         ),
-                        color: TodoColors.deepPurple,
                       ),
               ),
             ),

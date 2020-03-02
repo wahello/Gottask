@@ -7,7 +7,6 @@ import 'package:gottask/bloc/pokemon_bloc.dart';
 import 'package:gottask/bloc/star_bloc.dart';
 import 'package:gottask/bloc/today_task_bloc.dart';
 import 'package:gottask/screens/home_screen.dart';
-import 'package:gottask/screens/splash_screen/splash_screen.dart';
 import 'package:provider/provider.dart';
 
 class ConfigScreen extends StatefulWidget {

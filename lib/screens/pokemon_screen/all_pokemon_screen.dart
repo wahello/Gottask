@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:after_layout/after_layout.dart';
 import 'package:audioplayers/audio_cache.dart';
@@ -23,6 +24,7 @@ import 'package:swipedetector/swipedetector.dart';
 class AllPokemonScreen extends StatefulWidget {
   final BuildContext ctx;
   final int currentPokemon;
+
   AllPokemonScreen({
     this.ctx,
     this.currentPokemon,
@@ -211,6 +213,7 @@ class _AllPokemonScreenState extends State<AllPokemonScreen>
       getCurrentHandside();
       _currentStarPoint = currentStarPoint;
       _favouritePokemon = currentPokemon;
+
       _isInit = true;
     }
 
@@ -219,27 +222,11 @@ class _AllPokemonScreenState extends State<AllPokemonScreen>
       builder: (context, snapshot) => LayoutBuilder(
         builder: (context, constraints) {
           if (!snapshot.hasData) {
-            return Container(
-              height: MediaQuery.of(context).size.height,
-              width: MediaQuery.of(context).size.width,
-              decoration: BoxDecoration(
-                color: Colors.white,
-              ),
-            );
+            return _buildWaiting(context);
           }
           if (_currentHandside != null) {
             if (_currentHandside != snapshot.data) {
-              Future.delayed(
-                Duration(milliseconds: 100),
-                () {
-                  setState(() {});
-                  if (_scrollController.hasClients) {
-                    _scrollController.jumpTo(
-                      MediaQuery.of(context).size.width / 4 * _currentPokemon,
-                    );
-                  }
-                },
-              );
+              _buildRefresh(context);
               _currentHandside = snapshot.data;
             }
           }
@@ -254,7 +241,7 @@ class _AllPokemonScreenState extends State<AllPokemonScreen>
                   color: Colors.white,
                 ),
                 child: CustomPaint(
-                  painter: HeaderPainterLeftHand(
+                  painter: HeaderPainter(
                     ctx: widget.ctx,
                     type1: tagColor[pokedex[_currentPokemon]['type'][0]],
                   ),
@@ -265,109 +252,7 @@ class _AllPokemonScreenState extends State<AllPokemonScreen>
                       return Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
-                          Flexible(
-                            flex: 1,
-                            child: Stack(
-                              children: <Widget>[
-                                ListWheelScrollView(
-                                  controller: _scrollController,
-                                  physics: BouncingScrollPhysics(),
-                                  offAxisFraction:
-                                      (MediaQuery.of(context).size.height > 600)
-                                          ? 6
-                                          : 13,
-                                  onSelectedItemChanged: (value) {
-                                    setState(() {
-                                      _currentPokemon = value;
-                                    });
-                                  },
-                                  children: List.generate(
-                                    pokedex.length,
-                                    (index) {
-                                      return Container(
-                                        decoration: BoxDecoration(
-                                          border: Border.all(
-                                            color: TodoColors.deepPurple,
-                                            width: 2,
-                                          ),
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                        ),
-                                        margin: const EdgeInsets.only(
-                                          bottom: 5,
-                                          left: 5,
-                                          right: 5,
-                                        ),
-                                        padding: const EdgeInsets.all(5),
-                                        child: Stack(
-                                          children: <Widget>[
-                                            Image.asset(
-                                              pokemonImages[index],
-                                              height: MediaQuery.of(context)
-                                                          .size
-                                                          .width /
-                                                      4 -
-                                                  10,
-                                              color:
-                                                  snapshot.data[index].state ==
-                                                          0
-                                                      ? Colors.black54
-                                                      : null,
-                                              colorBlendMode:
-                                                  snapshot.data[index].state ==
-                                                          0
-                                                      ? BlendMode.modulate
-                                                      : null,
-                                            ),
-                                            if (snapshot.data[index].state == 0)
-                                              Align(
-                                                alignment:
-                                                    FractionalOffset.center,
-                                                child: Icon(
-                                                  AntDesign.question,
-                                                  size: 30,
-                                                  color: Colors.white,
-                                                ),
-                                              ),
-                                          ],
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                  itemExtent:
-                                      MediaQuery.of(context).size.width / 4,
-                                ),
-                                SafeArea(
-                                  child: Align(
-                                    alignment: FractionalOffset.bottomLeft,
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 15,
-                                        vertical: 20,
-                                      ),
-                                      child: GestureDetector(
-                                        child: Icon(
-                                          Icons.settings,
-                                          color: Colors.black45,
-                                          size: 30,
-                                        ),
-                                        onTap: () {
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (_) => SettingScreen(
-                                                ctx: context,
-                                              ),
-                                            ),
-                                          );
-                                        },
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
+                          _buildWheelPokemon(context, snapshot, isLeft: true),
                           Flexible(
                             flex: 3,
                             child: Stack(
@@ -726,7 +611,7 @@ class _AllPokemonScreenState extends State<AllPokemonScreen>
                 color: Colors.white,
               ),
               child: CustomPaint(
-                painter: HeaderPainterRightHand(
+                painter: HeaderPainter(
                   ctx: widget.ctx,
                   type1: tagColor[pokedex[_currentPokemon]['type'][0]],
                 ),
@@ -1071,106 +956,7 @@ class _AllPokemonScreenState extends State<AllPokemonScreen>
                             ],
                           ),
                         ),
-                        Flexible(
-                          flex: 1,
-                          child: Stack(
-                            children: <Widget>[
-                              ListWheelScrollView(
-                                controller: _scrollController,
-                                physics: BouncingScrollPhysics(),
-                                offAxisFraction:
-                                    (MediaQuery.of(context).size.height > 600)
-                                        ? -6
-                                        : -13,
-                                onSelectedItemChanged: (value) {
-                                  setState(() {
-                                    _currentPokemon = value;
-                                  });
-                                },
-                                children: List.generate(
-                                  pokedex.length,
-                                  (index) {
-                                    return Container(
-                                      decoration: BoxDecoration(
-                                        border: Border.all(
-                                          color: TodoColors.deepPurple,
-                                          width: 2,
-                                        ),
-                                        borderRadius: BorderRadius.circular(10),
-                                      ),
-                                      margin: const EdgeInsets.only(
-                                        bottom: 5,
-                                        left: 5,
-                                        right: 5,
-                                      ),
-                                      padding: const EdgeInsets.all(5),
-                                      child: Stack(
-                                        children: <Widget>[
-                                          Image.asset(
-                                            pokemonImages[index],
-                                            height: MediaQuery.of(context)
-                                                        .size
-                                                        .width /
-                                                    4 -
-                                                10,
-                                            color:
-                                                snapshot.data[index].state == 0
-                                                    ? Colors.black54
-                                                    : null,
-                                            colorBlendMode:
-                                                snapshot.data[index].state == 0
-                                                    ? BlendMode.modulate
-                                                    : null,
-                                          ),
-                                          if (snapshot.data[index].state == 0)
-                                            Align(
-                                              alignment:
-                                                  FractionalOffset.center,
-                                              child: Icon(
-                                                AntDesign.question,
-                                                size: 30,
-                                                color: Colors.white,
-                                              ),
-                                            ),
-                                        ],
-                                      ),
-                                    );
-                                  },
-                                ),
-                                itemExtent:
-                                    MediaQuery.of(context).size.width / 4,
-                              ),
-                              SafeArea(
-                                child: Align(
-                                  alignment: FractionalOffset.bottomRight,
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 15,
-                                      vertical: 20,
-                                    ),
-                                    child: GestureDetector(
-                                      child: Icon(
-                                        Icons.settings,
-                                        color: Colors.black45,
-                                        size: 30,
-                                      ),
-                                      onTap: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (_) => SettingScreen(
-                                              ctx: context,
-                                            ),
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
+                        _buildWheelPokemon(context, snapshot, isLeft: false),
                       ],
                     );
                   },
@@ -1179,6 +965,138 @@ class _AllPokemonScreenState extends State<AllPokemonScreen>
             ),
           );
         },
+      ),
+    );
+  }
+
+  Flexible _buildWheelPokemon(
+      BuildContext context, AsyncSnapshot<List<PokemonState>> snapshot,
+      {bool isLeft}) {
+    return Flexible(
+      flex: 1,
+      child: Stack(
+        children: <Widget>[
+          CustomPaint(
+            painter: CurvedPainted(
+              isLeft: isLeft,
+            ),
+            child: Align(
+              alignment: FractionalOffset.center,
+              child: SizedBox(
+                height: MediaQuery.of(context).size.height * 3 / 5,
+                child: ListWheelScrollView(
+                  controller: _scrollController,
+                  physics: BouncingScrollPhysics(),
+                  offAxisFraction: isLeft ? 4 : -4,
+                  onSelectedItemChanged: (value) {
+                    setState(() {
+                      _currentPokemon = value;
+                    });
+                  },
+                  children: List.generate(
+                    pokedex.length,
+                    (index) {
+                      return Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: TodoColors.deepPurple,
+                            width: 2,
+                          ),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        margin: const EdgeInsets.only(
+                          bottom: 5,
+                          left: 5,
+                          right: 5,
+                        ),
+                        padding: const EdgeInsets.all(5),
+                        child: Stack(
+                          children: <Widget>[
+                            Image.asset(
+                              pokemonImages[index],
+                              height:
+                                  MediaQuery.of(context).size.width / 4 - 10,
+                              color: snapshot.data[index].state == 0
+                                  ? Colors.black54
+                                  : null,
+                              colorBlendMode: snapshot.data[index].state == 0
+                                  ? BlendMode.modulate
+                                  : null,
+                            ),
+                            if (snapshot.data[index].state == 0)
+                              Align(
+                                alignment: FractionalOffset.center,
+                                child: Icon(
+                                  AntDesign.question,
+                                  size: 30,
+                                  color: Colors.white,
+                                ),
+                              ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                  itemExtent: MediaQuery.of(context).size.width / 4,
+                ),
+              ),
+            ),
+          ),
+          SafeArea(
+            child: Align(
+              alignment: isLeft
+                  ? FractionalOffset.bottomLeft
+                  : FractionalOffset.bottomRight,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 15,
+                  vertical: 20,
+                ),
+                child: GestureDetector(
+                  child: Icon(
+                    Icons.settings,
+                    color: Colors.black45,
+                    size: 30,
+                  ),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => SettingScreen(
+                          ctx: context,
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<dynamic> _buildRefresh(BuildContext context) {
+    return Future.delayed(
+      Duration(milliseconds: 100),
+      () {
+        setState(() {});
+        if (_scrollController.hasClients) {
+          _scrollController.jumpTo(
+            MediaQuery.of(context).size.width / 4 * _currentPokemon,
+          );
+        }
+      },
+    );
+  }
+
+  Container _buildWaiting(BuildContext context) {
+    return Container(
+      height: MediaQuery.of(context).size.height,
+      width: MediaQuery.of(context).size.width,
+      decoration: BoxDecoration(
+        color: Colors.white,
       ),
     );
   }
@@ -1224,36 +1142,45 @@ class _AllPokemonScreenState extends State<AllPokemonScreen>
   }
 }
 
-class HeaderPainterLeftHand extends CustomPainter {
-  final BuildContext ctx;
-  final Color type1;
-  const HeaderPainterLeftHand({
-    this.type1,
-    this.ctx,
-  });
+class CurvedPainted extends CustomPainter {
+  final bool isLeft;
+  CurvedPainted({this.isLeft});
   @override
   void paint(Canvas canvas, Size size) {
     Paint paint = Paint();
     Path path = Path();
 
-    path.lineTo(size.width, 0);
-    path.lineTo(size.width, size.height);
-    path.lineTo(0, size.height);
-    path.lineTo(0, 0);
-    paint = Paint()..color = type1.withOpacity(0.6);
-    canvas.drawPath(path, paint);
-
-    path.reset();
-    path.moveTo(0, size.height / 5);
-    path.quadraticBezierTo(
-      size.width / 2 + 8.3,
-      size.height / 2,
-      0,
-      size.height * 4 / 5,
-    );
+    if (isLeft) {
+      path.moveTo(0, size.height * 1 / 5 - 15);
+      path.quadraticBezierTo(
+        size.width,
+        size.height / 3.5,
+        size.width + 5,
+        size.height / 2,
+      );
+      path.quadraticBezierTo(
+        size.width,
+        size.height * (1 - 1 / 3.5),
+        0,
+        size.height * 4 / 5 + 15,
+      );
+    } else {
+      path.moveTo(size.width, size.height * 1 / 5 - 15);
+      path.quadraticBezierTo(
+        0,
+        size.height / 3.5,
+        -5,
+        size.height / 2,
+      );
+      path.quadraticBezierTo(
+        0,
+        size.height * (1 - 1 / 3.5),
+        size.width,
+        size.height * 4 / 5 + 15,
+      );
+    }
 
     paint = Paint()..color = Colors.white;
-
     canvas.drawPath(path, paint);
   }
 
@@ -1261,10 +1188,10 @@ class HeaderPainterLeftHand extends CustomPainter {
   bool shouldRepaint(CustomPainter oldDelegate) => oldDelegate != this;
 }
 
-class HeaderPainterRightHand extends CustomPainter {
+class HeaderPainter extends CustomPainter {
   final BuildContext ctx;
   final Color type1;
-  const HeaderPainterRightHand({
+  const HeaderPainter({
     this.type1,
     this.ctx,
   });
@@ -1278,19 +1205,6 @@ class HeaderPainterRightHand extends CustomPainter {
     path.lineTo(0, size.height);
     path.lineTo(0, 0);
     paint = Paint()..color = type1.withOpacity(0.6);
-    canvas.drawPath(path, paint);
-
-    path.reset();
-    path.moveTo(size.width, size.height / 5);
-    path.quadraticBezierTo(
-      size.width / 2 - 8.3,
-      size.height / 2,
-      size.width,
-      size.height * 4 / 5,
-    );
-
-    paint = Paint()..color = Colors.white;
-
     canvas.drawPath(path, paint);
   }
 

@@ -103,41 +103,11 @@ class _HomeScreenState extends State<HomeScreen>
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.only(
-                      right: 15,
-                      top: 15,
-                    ),
-                    child: _buildHeader(),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 14,
-                      vertical: 5,
-                    ),
-                    child: Material(
-                      borderRadius: BorderRadius.circular(10),
-                      color: Colors.white,
-                      elevation: 7,
-                      child: Padding(
-                        padding: const EdgeInsets.all(5),
-                        child: _buildPetCollection(),
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(
-                      left: 20,
-                    ),
-                    child: _buildHabitTitle(),
-                  ),
+                  _buildHeader(),
+                  _buildPetCollection(),
+                  _buildHabitTitle(),
                   buildHabit(),
-                  Padding(
-                    padding: const EdgeInsets.only(
-                      left: 20,
-                    ),
-                    child: _buildTodaysTaskHeader(),
-                  ),
+                  _buildTodaysTaskHeader(),
                 ],
               ),
               _buildTodayTask(),
@@ -237,111 +207,124 @@ class _HomeScreenState extends State<HomeScreen>
         ),
       );
 
-  Widget _buildPetCollection() {
-    return Consumer<PokemonStateBloc>(
-      builder: (context, bloc, child) => Container(
-        height: 80,
-        width: MediaQuery.of(context).size.width - 20,
-        padding: const EdgeInsets.all(5),
-        child: Consumer<PokemonStateBloc>(
-          builder: (context, bloc, child) => StreamBuilder<List<PokemonState>>(
-            stream: bloc.listPokemonStateStream,
-            builder: (context, snapshot) {
-              if (!snapshot.hasData) {
-                return Center(
-                  child: Text('Waiting ...'),
-                );
-              }
-              return ListView.builder(
-                physics: const BouncingScrollPhysics(),
-                addRepaintBoundaries: true,
-                scrollDirection: Axis.horizontal,
-                itemCount: snapshot.data.length,
-                itemBuilder: (context, index) {
-                  return GestureDetector(
-                    onLongPress: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => MultiProvider(
-                            providers: [
-                              Provider<AllPokemonBloc>.value(
-                                value: AllPokemonBloc(),
+  Widget _buildPetCollection() => Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: 14,
+          vertical: 5,
+        ),
+        child: Material(
+          borderRadius: BorderRadius.circular(10),
+          color: Colors.white,
+          elevation: 7,
+          child: Padding(
+            padding: const EdgeInsets.all(5),
+            child: Consumer<PokemonStateBloc>(
+              builder: (context, bloc, child) => Container(
+                height: 80,
+                width: MediaQuery.of(context).size.width - 20,
+                padding: const EdgeInsets.all(5),
+                child: Consumer<PokemonStateBloc>(
+                  builder: (context, bloc, child) =>
+                      StreamBuilder<List<PokemonState>>(
+                    stream: bloc.listPokemonStateStream,
+                    builder: (context, snapshot) {
+                      if (!snapshot.hasData) {
+                        return Center(
+                          child: Text('Waiting ...'),
+                        );
+                      }
+                      return ListView.builder(
+                        physics: const BouncingScrollPhysics(),
+                        addRepaintBoundaries: true,
+                        scrollDirection: Axis.horizontal,
+                        itemCount: snapshot.data.length,
+                        itemBuilder: (context, index) {
+                          return GestureDetector(
+                            onLongPress: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => MultiProvider(
+                                    providers: [
+                                      Provider<AllPokemonBloc>.value(
+                                        value: AllPokemonBloc(),
+                                      ),
+                                      Provider<HandsideBloc>.value(
+                                        value: HandsideBloc(),
+                                      ),
+                                    ],
+                                    child: AllPokemonScreen(
+                                      ctx: context,
+                                      currentPokemon: index,
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => PokemonInfoScreen(
+                                    ctx: context,
+                                    imageTag: pokemonImages[index],
+                                    index: index,
+                                  ),
+                                ),
+                              );
+                            },
+                            child: Container(
+                              width: 56,
+                              height: 72,
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: Colors.deepPurple,
+                                  width: 1,
+                                ),
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(10),
                               ),
-                              Provider<HandsideBloc>.value(
-                                value: HandsideBloc(),
-                              ),
-                            ],
-                            child: AllPokemonScreen(
-                              ctx: context,
-                              currentPokemon: index,
-                            ),
-                          ),
-                        ),
-                      );
-                    },
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => PokemonInfoScreen(
-                            ctx: context,
-                            imageTag: pokemonImages[index],
-                            index: index,
-                          ),
-                        ),
-                      );
-                    },
-                    child: Container(
-                      width: 56,
-                      height: 72,
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: Colors.deepPurple,
-                          width: 1,
-                        ),
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      margin: index < pokemonImages.length - 1
-                          ? const EdgeInsets.only(right: 8)
-                          : EdgeInsets.zero,
-                      padding: const EdgeInsets.all(5),
-                      child: Center(
-                        child: Stack(
-                          children: <Widget>[
-                            Image.asset(
-                              pokemonImages[index],
-                              height: 70,
-                              width: 70,
-                              color: colorStateOfPokemon(
-                                snapshot.data[index].state,
-                              ),
-                              colorBlendMode: colorBlendStateOfPokemon(
-                                snapshot.data[index].state,
-                              ),
-                            ),
-                            if (snapshot.data[index].state == 0)
-                              Align(
-                                alignment: FractionalOffset.center,
-                                child: Icon(
-                                  AntDesign.question,
-                                  color: Colors.white,
+                              margin: index < pokemonImages.length - 1
+                                  ? const EdgeInsets.only(right: 8)
+                                  : EdgeInsets.zero,
+                              padding: const EdgeInsets.all(5),
+                              child: Center(
+                                child: Stack(
+                                  children: <Widget>[
+                                    Image.asset(
+                                      pokemonImages[index],
+                                      height: 70,
+                                      width: 70,
+                                      color: colorStateOfPokemon(
+                                        snapshot.data[index].state,
+                                      ),
+                                      colorBlendMode: colorBlendStateOfPokemon(
+                                        snapshot.data[index].state,
+                                      ),
+                                    ),
+                                    if (snapshot.data[index].state == 0)
+                                      Align(
+                                        alignment: FractionalOffset.center,
+                                        child: Icon(
+                                          AntDesign.question,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                  ],
                                 ),
                               ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  );
-                },
-              );
-            },
+                            ),
+                          );
+                        },
+                      );
+                    },
+                  ),
+                ),
+              ),
+            ),
           ),
         ),
-      ),
-    );
-  }
+      );
 
   Color colorStateOfPokemon(int state) {
     if (state == 0) {
@@ -405,7 +388,11 @@ class _HomeScreenState extends State<HomeScreen>
       );
 
   Padding _buildTodaysTaskHeader() => Padding(
-        padding: const EdgeInsets.symmetric(vertical: 10),
+        padding: const EdgeInsets.only(
+          top: 10,
+          bottom: 10,
+          left: 20,
+        ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
@@ -433,7 +420,11 @@ class _HomeScreenState extends State<HomeScreen>
       );
 
   Widget _buildHabitTitle() => Padding(
-        padding: const EdgeInsets.symmetric(vertical: 10),
+        padding: const EdgeInsets.only(
+          left: 20,
+          top: 10,
+          bottom: 10,
+        ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -471,135 +462,156 @@ class _HomeScreenState extends State<HomeScreen>
         ),
       );
 
-  Widget _buildHeader() => Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.only(left: 15),
-            child: Row(
+  Widget _buildHeader() => Padding(
+        padding: const EdgeInsets.only(
+          right: 15,
+          top: 5,
+        ),
+        child: Stack(
+          children: <Widget>[
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
-                StreamBuilder<int>(
-                  stream: _currentPokemonBloc.currentPokemonStream,
-                  builder: (context, snapshot) {
-                    if (!snapshot.hasData) return Container();
-                    if (snapshot.data != -1) {
-                      return GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => MultiProvider(
-                                providers: [
-                                  Provider<AllPokemonBloc>.value(
-                                    value: AllPokemonBloc(),
+                Padding(
+                  padding: const EdgeInsets.only(left: 15),
+                  child: Row(
+                    children: <Widget>[
+                      StreamBuilder<int>(
+                        stream: _currentPokemonBloc.currentPokemonStream,
+                        builder: (context, snapshot) {
+                          if (!snapshot.hasData) return Container();
+                          if (snapshot.data != -1) {
+                            return GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => MultiProvider(
+                                      providers: [
+                                        Provider<AllPokemonBloc>.value(
+                                          value: AllPokemonBloc(),
+                                        ),
+                                        Provider<HandsideBloc>.value(
+                                          value: HandsideBloc(),
+                                        ),
+                                      ],
+                                      child: AllPokemonScreen(
+                                        ctx: context,
+                                        currentPokemon: snapshot.data,
+                                      ),
+                                    ),
                                   ),
-                                  Provider<HandsideBloc>.value(
-                                    value: HandsideBloc(),
+                                );
+                              },
+                              child: Material(
+                                borderRadius: BorderRadius.circular(30),
+                                color: Colors.white,
+                                elevation: 1,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Image.asset(
+                                    pokemonImages[snapshot.data],
+                                    height: 30,
                                   ),
-                                ],
-                                child: AllPokemonScreen(
-                                  ctx: context,
-                                  currentPokemon: snapshot.data,
                                 ),
                               ),
-                            ),
-                          );
-                        },
-                        child: Material(
-                          borderRadius: BorderRadius.circular(30),
-                          color: Colors.white,
-                          elevation: 1,
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Image.asset(
-                              pokemonImages[snapshot.data],
-                              height: 30,
-                            ),
-                          ),
-                        ),
-                      );
-                    } else {
-                      return GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => MultiProvider(
-                                providers: [
-                                  Provider<AllPokemonBloc>.value(
-                                    value: AllPokemonBloc(),
+                            );
+                          } else {
+                            return GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => MultiProvider(
+                                      providers: [
+                                        Provider<AllPokemonBloc>.value(
+                                          value: AllPokemonBloc(),
+                                        ),
+                                        Provider<HandsideBloc>.value(
+                                          value: HandsideBloc(),
+                                        ),
+                                      ],
+                                      child: AllPokemonScreen(
+                                        ctx: context,
+                                        currentPokemon: 0,
+                                      ),
+                                    ),
                                   ),
-                                  Provider<HandsideBloc>.value(
-                                    value: HandsideBloc(),
+                                );
+                              },
+                              child: Material(
+                                borderRadius: BorderRadius.circular(30),
+                                color: Colors.white,
+                                elevation: 1,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Icon(
+                                    MaterialCommunityIcons.pokeball,
+                                    size: 30,
+                                    color: Colors.black45,
                                   ),
-                                ],
-                                child: AllPokemonScreen(
-                                  ctx: context,
-                                  currentPokemon: 0,
                                 ),
                               ),
-                            ),
-                          );
+                            );
+                          }
                         },
-                        child: Material(
-                          borderRadius: BorderRadius.circular(30),
-                          color: Colors.white,
-                          elevation: 1,
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Icon(
-                              MaterialCommunityIcons.pokeball,
-                              size: 30,
-                              color: Colors.black45,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(10.0),
+                        child: Column(
+                          children: <Widget>[
+                            Row(
+                              children: <Widget>[
+                                StreamBuilder<int>(
+                                  initialData: 0,
+                                  stream: _starBloc.pointStream,
+                                  builder: (context, snapshot) => Text(
+                                    '${snapshot.data} ',
+                                    style: TextStyle(
+                                      fontFamily: 'Alata',
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                ),
+                                Image.asset(
+                                  'assets/png/star.png',
+                                  height: 13,
+                                ),
+                              ],
                             ),
-                          ),
+                          ],
                         ),
-                      );
-                    }
-                  },
-                ),
-                StreamBuilder<int>(
-                  initialData: 0,
-                  stream: _starBloc.pointStream,
-                  builder: (context, snapshot) => Text(
-                    '  ${snapshot.data} ',
-                    style: TextStyle(
-                      fontFamily: 'Alata',
-                      fontSize: 16,
-                    ),
+                      ),
+                    ],
                   ),
                 ),
-                Image.asset(
-                  'assets/png/star.png',
-                  height: 13,
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: <Widget>[
+                    Text(
+                      getTimeNow(),
+                      style: TextStyle(
+                        fontFamily: 'Alata',
+                        fontSize: 25,
+                        fontWeight: FontWeight.w400,
+                        color: const Color(0xFF061058),
+                      ),
+                    ),
+                    Text(
+                      '${DateFormat.yMMMEd().format(DateTime.now())}',
+                      style: TextStyle(
+                        fontFamily: 'Alata',
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 5),
+                  ],
                 ),
               ],
             ),
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: <Widget>[
-              Text(
-                getTimeNow(),
-                style: TextStyle(
-                  fontFamily: 'Alata',
-                  fontSize: 25,
-                  fontWeight: FontWeight.w400,
-                  color: const Color(0xFF061058),
-                ),
-              ),
-              Text(
-                '${DateFormat.yMMMEd().format(DateTime.now())}',
-                style: TextStyle(
-                  fontFamily: 'Alata',
-                  fontSize: 15,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 5),
-            ],
-          ),
-        ],
+          ],
+        ),
       );
 
   String getTimeNow() {

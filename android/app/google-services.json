@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "544719112723",
+    "firebase_url": "https://gottask-8a772.firebaseio.com",
+    "project_id": "gottask-8a772",
+    "storage_bucket": "gottask-8a772.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:544719112723:android:64a1d6da898e15fed8cde6",
+        "android_client_info": {
+          "package_name": "com.example.gottask"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "544719112723-88e8mhr2b7mqk5bhj79pvb37bjn3ht8h.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAzj2gQMeXHCdZMMHeqFEu-3Y_51jpCQMc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "544719112723-88e8mhr2b7mqk5bhj79pvb37bjn3ht8h.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

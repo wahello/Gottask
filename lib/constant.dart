@@ -271,6 +271,14 @@ Future<int> readHabitGiveUp() async {
 
 const double kListViewHeight = 155;
 
+const String testDevice = 'Test-id';
+
+const String appId = 'ca-app-pub-8520565961626834~3121713860';
+
+const String rewardAdsId = 'ca-app-pub-8520565961626834/3185308951';
+
+const String bannerId = 'ca-app-pub-8520565961626834/1972283720';
+
 List<String> icons = [
   "Icons.star_border",
   "Icons.airline_seat_individual_suite",
