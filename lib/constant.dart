@@ -45,6 +45,7 @@ class TodoColors {
 List<String> splashScreen = [
   'assets/splash/screen_home.jpg',
   'assets/splash/screen_add_todo.png',
+  'assets/splash/screen_habit_1.jpg',
   'assets/splash/screen_habit.png',
   'assets/splash/screen_pokemon_all.jpg',
 ];
@@ -95,7 +96,7 @@ Future<int> updateHandSide(HandSide handSide) async {
 Future<int> currentStar() async {
   final prefs = await SharedPreferences.getInstance();
   final key = 'my_star_key';
-  if (prefs.getInt(key) == null) prefs.setInt(key, 0);
+  if (prefs.getInt(key) == null) prefs.setInt(key, 480);
   final value = prefs.getInt(key);
   return value;
 }

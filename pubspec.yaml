@@ -65,6 +65,7 @@ flutter:
     - assets/icon/icon.png
     - assets/splash/screen_add_todo.png
     - assets/splash/screen_habit.png
+    - assets/splash/screen_habit_1.jpg
     - assets/splash/screen_home.jpg
     - assets/splash/screen_pokemon_all.jpg
 

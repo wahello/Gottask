@@ -379,7 +379,8 @@ class _AddTodayTaskScreenState extends State<AddTodayTaskScreen>
                                 child: AnimatedOpacity(
                                   duration: animationController.duration,
                                   opacity: animation.value,
-                                  child: Container(
+                                  child: AnimatedContainer(
+                                    duration: Duration(milliseconds: 200),
                                     margin: const EdgeInsets.symmetric(
                                         vertical: 10),
                                     width: 100,
@@ -631,62 +632,51 @@ class _AddTodayTaskScreenState extends State<AddTodayTaskScreen>
     );
   }
 
-  Widget _buildCatagoriesPicker() {
-    return Padding(
-      padding: const EdgeInsets.only(
-        top: 5,
-      ),
-      child: Wrap(
-        children: List.generate(
-          catagories.length,
-          (index) => Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(
-                color: _catagoryItems[index] == false
-                    ? Color(
-                        int.parse(
-                          colors[indexColor],
-                        ),
-                      )
-                    : Colors.white,
-              ),
-              color: _catagoryItems[index]
-                  ? Color(
-                      int.parse(
-                        colors[indexColor],
-                      ),
-                    )
-                  : Colors.white,
-            ),
-            padding: const EdgeInsets.all(8),
-            margin: const EdgeInsets.only(
-              bottom: 5,
-              right: 5,
-            ),
-            child: FittedBox(
-              child: InkWell(
-                onTap: () {
-                  setState(() {
-                    _catagoryItems[index] = !_catagoryItems[index];
-                  });
-                },
-                child: Row(
-                  children: <Widget>[
-                    Icon(
-                      catagoryIcons[index],
-                      size: 15,
-                      color: _catagoryItems[index] == false
-                          ? Color(
-                              int.parse(
-                                colors[indexColor],
-                              ),
-                            )
-                          : Colors.white,
-                    ),
-                    Text(
-                      ' ${catagories[index]}',
-                      style: TextStyle(
+  Widget _buildCatagoriesPicker() => Padding(
+        padding: const EdgeInsets.only(
+          top: 5,
+        ),
+        child: Wrap(
+          children: List.generate(
+            catagories.length,
+            (index) => GestureDetector(
+              onTap: () {
+                setState(() {
+                  _catagoryItems[index] = !_catagoryItems[index];
+                });
+              },
+              child: AnimatedContainer(
+                duration: Duration(milliseconds: 100),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: _catagoryItems[index] == false
+                        ? Color(
+                            int.parse(
+                              colors[indexColor],
+                            ),
+                          )
+                        : Colors.white,
+                  ),
+                  color: _catagoryItems[index]
+                      ? Color(
+                          int.parse(
+                            colors[indexColor],
+                          ),
+                        )
+                      : Colors.white,
+                ),
+                padding: const EdgeInsets.all(8),
+                margin: const EdgeInsets.only(
+                  bottom: 5,
+                  right: 5,
+                ),
+                child: FittedBox(
+                  child: Row(
+                    children: <Widget>[
+                      Icon(
+                        catagoryIcons[index],
+                        size: 15,
                         color: _catagoryItems[index] == false
                             ? Color(
                                 int.parse(
@@ -695,16 +685,26 @@ class _AddTodayTaskScreenState extends State<AddTodayTaskScreen>
                               )
                             : Colors.white,
                       ),
-                    ),
-                  ],
+                      Text(
+                        ' ${catagories[index]}',
+                        style: TextStyle(
+                          color: _catagoryItems[index] == false
+                              ? Color(
+                                  int.parse(
+                                    colors[indexColor],
+                                  ),
+                                )
+                              : Colors.white,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
           ),
         ),
-      ),
-    );
-  }
+      );
 
   Widget _buildColorPicker() => Padding(
         padding: const EdgeInsets.symmetric(vertical: 8),
@@ -857,7 +857,8 @@ class _AddTodayTaskScreenState extends State<AddTodayTaskScreen>
         ),
       );
 
-  Container _buildTaskNameTextField() => Container(
+  Widget _buildTaskNameTextField() => AnimatedContainer(
+        duration: Duration(milliseconds: 100),
         margin: const EdgeInsets.all(10),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
@@ -882,22 +883,10 @@ class _AddTodayTaskScreenState extends State<AddTodayTaskScreen>
         ),
       );
 
-  RaisedButton _buildAddTaskButton(
+  Widget _buildAddTaskButton(
           TodayTaskBloc _todayTaskBloc, BuildContext context) =>
-      RaisedButton.icon(
-        icon: Icon(
-          Ionicons.ios_add,
-          color: Colors.white,
-        ),
-        label: Text(
-          'Add to-do',
-          style: TextStyle(
-            fontFamily: 'Alata',
-            color: Colors.white,
-            fontSize: 16,
-          ),
-        ),
-        onPressed: () async {
+      GestureDetector(
+        onTap: () async {
           if (_isRecording == false) {
             isCreate = true;
             int id = await saveTodayTaskID();
@@ -932,8 +921,30 @@ class _AddTodayTaskScreenState extends State<AddTodayTaskScreen>
             await showWarning(context);
           }
         },
-        color: Color(int.parse(colors[indexColor])),
-        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        child: AnimatedContainer(
+          duration: Duration(milliseconds: 300),
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Icon(
+                  Ionicons.ios_add,
+                  color: Colors.white,
+                ),
+                Text(
+                  ' Add to-do',
+                  style: TextStyle(
+                    fontFamily: 'Alata',
+                    color: Colors.white,
+                    fontSize: 16,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          color: Color(int.parse(colors[indexColor])),
+        ),
       );
 
   Future showWarning(BuildContext context) => showDialog(

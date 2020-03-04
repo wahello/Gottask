@@ -70,20 +70,32 @@ class _AddHabitScreenState extends State<AddHabitScreen> {
             ),
           ],
         ),
-        bottomNavigationBar: RaisedButton.icon(
-          icon: Icon(
-            Ionicons.ios_add,
-            color: Colors.white,
-          ),
-          label: Text(
-            'Add task',
-            style: TextStyle(
-              fontFamily: 'Alata',
-              color: Colors.white,
-              fontSize: 16,
+        bottomNavigationBar: GestureDetector(
+          child: AnimatedContainer(
+            duration: Duration(milliseconds: 200),
+            color: Color(int.parse(colors[indexColor])),
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Icon(
+                    Ionicons.ios_add,
+                    color: Colors.white,
+                  ),
+                  Text(
+                    ' Add task',
+                    style: TextStyle(
+                      fontFamily: 'Alata',
+                      color: Colors.white,
+                      fontSize: 16,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
-          onPressed: () async {
+          onTap: () async {
             if (_habitNameTextController.text == null ||
                 _habitNameTextController.text == '' ||
                 timer == const Duration(hours: 0, minutes: 0)) {
@@ -127,39 +139,13 @@ class _AddHabitScreenState extends State<AddHabitScreen> {
               Navigator.pop(context);
             }
           },
-          color: Color(int.parse(colors[indexColor])),
-          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
         ),
         body: SingleChildScrollView(
           padding: const EdgeInsets.only(top: 20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(
-                      color: Color(int.parse(colors[indexColor])),
-                      width: 1,
-                    ),
-                  ),
-                  child: TextField(
-                    decoration: InputDecoration(
-                      contentPadding: const EdgeInsets.all(10),
-                      labelText: 'Task name',
-                      labelStyle: TextStyle(
-                        fontFamily: 'Alata',
-                        color: Colors.grey,
-                        fontSize: 16,
-                      ),
-                      border: InputBorder.none,
-                    ),
-                    controller: _habitNameTextController,
-                  ),
-                ),
-              ),
+              _buildRename(),
               const SizedBox(height: 10),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -325,6 +311,35 @@ class _AddHabitScreenState extends State<AddHabitScreen> {
     );
   }
 
+  Widget _buildRename() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: AnimatedContainer(
+        duration: Duration(milliseconds: 200),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(
+            color: Color(int.parse(colors[indexColor])),
+            width: 1,
+          ),
+        ),
+        child: TextField(
+          decoration: InputDecoration(
+            contentPadding: const EdgeInsets.all(10),
+            labelText: 'Task name',
+            labelStyle: TextStyle(
+              fontFamily: 'Alata',
+              color: Colors.grey,
+              fontSize: 16,
+            ),
+            border: InputBorder.none,
+          ),
+          controller: _habitNameTextController,
+        ),
+      ),
+    );
+  }
+
   Widget _buildCatagoriesPicker() {
     return Padding(
       padding: const EdgeInsets.only(
@@ -334,11 +349,26 @@ class _AddHabitScreenState extends State<AddHabitScreen> {
       child: Wrap(
         children: List.generate(
           catagories.length,
-          (index) => Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(
-                color: _catagoryItems[index] == false
+          (index) => GestureDetector(
+            onTap: () {
+              setState(() {
+                _catagoryItems[index] = !_catagoryItems[index];
+              });
+            },
+            child: AnimatedContainer(
+              duration: Duration(milliseconds: 200),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(
+                  color: _catagoryItems[index] == false
+                      ? Color(
+                          int.parse(
+                            colors[indexColor],
+                          ),
+                        )
+                      : Colors.white,
+                ),
+                color: _catagoryItems[index]
                     ? Color(
                         int.parse(
                           colors[indexColor],
@@ -346,26 +376,12 @@ class _AddHabitScreenState extends State<AddHabitScreen> {
                       )
                     : Colors.white,
               ),
-              color: _catagoryItems[index]
-                  ? Color(
-                      int.parse(
-                        colors[indexColor],
-                      ),
-                    )
-                  : Colors.white,
-            ),
-            padding: const EdgeInsets.all(8),
-            margin: const EdgeInsets.only(
-              bottom: 5,
-              right: 5,
-            ),
-            child: FittedBox(
-              child: InkWell(
-                onTap: () {
-                  setState(() {
-                    _catagoryItems[index] = !_catagoryItems[index];
-                  });
-                },
+              padding: const EdgeInsets.all(8),
+              margin: const EdgeInsets.only(
+                bottom: 5,
+                right: 5,
+              ),
+              child: FittedBox(
                 child: Row(
                   children: <Widget>[
                     Icon(

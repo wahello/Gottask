@@ -20,7 +20,6 @@ import 'package:gottask/models/pokemon_state.dart';
 import 'package:gottask/models/today_task.dart';
 import 'package:gottask/screens/habit_screen/add_habit_screen.dart';
 import 'package:gottask/screens/pokemon_screen/all_pokemon_screen.dart';
-import 'package:gottask/screens/pokemon_screen/pokemon_info_screen.dart';
 import 'package:gottask/screens/todo_screen/add_today_task_screen.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -207,125 +206,6 @@ class _HomeScreenState extends State<HomeScreen>
         ),
       );
 
-  Widget _buildPetCollection() => Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: 14,
-          vertical: 5,
-        ),
-        child: Material(
-          borderRadius: BorderRadius.circular(10),
-          color: Colors.white,
-          elevation: 7,
-          child: Padding(
-            padding: const EdgeInsets.all(5),
-            child: Consumer<PokemonStateBloc>(
-              builder: (context, bloc, child) => Container(
-                height: 80,
-                width: MediaQuery.of(context).size.width - 20,
-                padding: const EdgeInsets.all(5),
-                child: Consumer<PokemonStateBloc>(
-                  builder: (context, bloc, child) =>
-                      StreamBuilder<List<PokemonState>>(
-                    stream: bloc.listPokemonStateStream,
-                    builder: (context, snapshot) {
-                      if (!snapshot.hasData) {
-                        return Center(
-                          child: Text('Waiting ...'),
-                        );
-                      }
-                      return ListView.builder(
-                        physics: const BouncingScrollPhysics(),
-                        addRepaintBoundaries: true,
-                        scrollDirection: Axis.horizontal,
-                        itemCount: snapshot.data.length,
-                        itemBuilder: (context, index) {
-                          return GestureDetector(
-                            onLongPress: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => MultiProvider(
-                                    providers: [
-                                      Provider<AllPokemonBloc>.value(
-                                        value: AllPokemonBloc(),
-                                      ),
-                                      Provider<HandsideBloc>.value(
-                                        value: HandsideBloc(),
-                                      ),
-                                    ],
-                                    child: AllPokemonScreen(
-                                      ctx: context,
-                                      currentPokemon: index,
-                                    ),
-                                  ),
-                                ),
-                              );
-                            },
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => PokemonInfoScreen(
-                                    ctx: context,
-                                    imageTag: pokemonImages[index],
-                                    index: index,
-                                  ),
-                                ),
-                              );
-                            },
-                            child: Container(
-                              width: 56,
-                              height: 72,
-                              decoration: BoxDecoration(
-                                border: Border.all(
-                                  color: Colors.deepPurple,
-                                  width: 1,
-                                ),
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              margin: index < pokemonImages.length - 1
-                                  ? const EdgeInsets.only(right: 8)
-                                  : EdgeInsets.zero,
-                              padding: const EdgeInsets.all(5),
-                              child: Center(
-                                child: Stack(
-                                  children: <Widget>[
-                                    Image.asset(
-                                      pokemonImages[index],
-                                      height: 70,
-                                      width: 70,
-                                      color: colorStateOfPokemon(
-                                        snapshot.data[index].state,
-                                      ),
-                                      colorBlendMode: colorBlendStateOfPokemon(
-                                        snapshot.data[index].state,
-                                      ),
-                                    ),
-                                    if (snapshot.data[index].state == 0)
-                                      Align(
-                                        alignment: FractionalOffset.center,
-                                        child: Icon(
-                                          AntDesign.question,
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          );
-                        },
-                      );
-                    },
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-      );
-
   Color colorStateOfPokemon(int state) {
     if (state == 0) {
       return Colors.black45;
@@ -341,126 +221,6 @@ class _HomeScreenState extends State<HomeScreen>
       return null;
     }
   }
-
-  Widget _buildTodayTask() => Expanded(
-        child: Consumer<TodayTaskBloc>(
-          builder: (context, bloc, child) => StreamBuilder<List<TodayTask>>(
-            initialData: const [],
-            stream: bloc.listTodayTaskStream,
-            builder: (context, snapshot) {
-              if (!snapshot.hasData) {
-                return const Center(
-                  child: Text(
-                    'Empty to-do',
-                    style: TextStyle(
-                      fontFamily: 'Alata',
-                      fontSize: 16,
-                    ),
-                  ),
-                );
-              }
-              if (snapshot.data.isEmpty) {
-                return const Center(
-                  child: Text(
-                    'Empty to-do',
-                    style: TextStyle(
-                      fontFamily: 'Alata',
-                      fontSize: 16,
-                    ),
-                  ),
-                );
-              }
-
-              return ListView.builder(
-                physics: BouncingScrollPhysics(),
-                padding: EdgeInsets.zero,
-                itemCount: snapshot.data.length,
-                itemBuilder: (context, index) => TodayTaskTile(
-                  ctx: context,
-                  task: snapshot.data[index],
-                  index: index,
-                  key: UniqueKey(),
-                ),
-              );
-            },
-          ),
-        ),
-      );
-
-  Padding _buildTodaysTaskHeader() => Padding(
-        padding: const EdgeInsets.only(
-          top: 10,
-          bottom: 10,
-          left: 20,
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            const Text(
-              'To-do list',
-              style: TextStyle(fontFamily: 'Alata', fontSize: 20),
-            ),
-            Container(
-              width: 25,
-              height: 25,
-              margin: const EdgeInsets.only(right: 20),
-              child: RawMaterialButton(
-                fillColor: TodoColors.deepPurple,
-                shape: const CircleBorder(),
-                elevation: 2,
-                child: Icon(
-                  Icons.add,
-                  color: Colors.white,
-                ),
-                onPressed: _modalBottomSheetMenu,
-              ),
-            ),
-          ],
-        ),
-      );
-
-  Widget _buildHabitTitle() => Padding(
-        padding: const EdgeInsets.only(
-          left: 20,
-          top: 10,
-          bottom: 10,
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'Task list',
-              style: TextStyle(fontFamily: 'Alata', fontSize: 20),
-            ),
-            const SizedBox(width: 10),
-            Container(
-              width: 25,
-              height: 25,
-              margin: const EdgeInsets.only(right: 20),
-              child: RawMaterialButton(
-                fillColor: TodoColors.deepPurple,
-                shape: const CircleBorder(),
-                elevation: 2,
-                child: Icon(
-                  Icons.add,
-                  color: Colors.white,
-                ),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => AddHabitScreen(
-                        ctx: context,
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
-          ],
-        ),
-      );
 
   Widget _buildHeader() => Padding(
         padding: const EdgeInsets.only(
@@ -609,6 +369,247 @@ class _HomeScreenState extends State<HomeScreen>
                   ],
                 ),
               ],
+            ),
+          ],
+        ),
+      );
+
+  Widget _buildPetCollection() => Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: 14,
+          vertical: 5,
+        ),
+        child: Material(
+          borderRadius: BorderRadius.circular(10),
+          color: Colors.white,
+          elevation: 7,
+          child: Padding(
+            padding: const EdgeInsets.all(5),
+            child: Consumer<PokemonStateBloc>(
+              builder: (context, bloc, child) => Container(
+                height: 85,
+                width: MediaQuery.of(context).size.width - 20,
+                padding: const EdgeInsets.all(5),
+                child: Consumer<PokemonStateBloc>(
+                  builder: (context, bloc, child) =>
+                      StreamBuilder<List<PokemonState>>(
+                    stream: bloc.listPokemonStateStream,
+                    builder: (context, snapshot) {
+                      if (!snapshot.hasData) {
+                        return Center(
+                          child: Text('Waiting ...'),
+                        );
+                      }
+                      return ListView.builder(
+                        physics: const BouncingScrollPhysics(),
+                        addRepaintBoundaries: true,
+                        scrollDirection: Axis.horizontal,
+                        itemCount: snapshot.data.length,
+                        itemBuilder: (context, index) {
+                          return GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => MultiProvider(
+                                    providers: [
+                                      Provider<AllPokemonBloc>.value(
+                                        value: AllPokemonBloc(),
+                                      ),
+                                      Provider<HandsideBloc>.value(
+                                        value: HandsideBloc(),
+                                      ),
+                                    ],
+                                    child: AllPokemonScreen(
+                                      ctx: context,
+                                      currentPokemon: index,
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
+                            child: Container(
+                              width: 56,
+                              height: 70,
+                              decoration: BoxDecoration(
+                                  border: Border.all(
+                                    color: Colors.deepPurple,
+                                    width: 1,
+                                  ),
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(10),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      blurRadius: 0.5,
+                                      spreadRadius: 0.5,
+                                      color: Colors.black12,
+                                    )
+                                  ]),
+                              margin: index < pokemonImages.length - 1
+                                  ? const EdgeInsets.only(
+                                      right: 8,
+                                      bottom: 2,
+                                      top: 2,
+                                    )
+                                  : const EdgeInsets.only(
+                                      right: 3,
+                                      bottom: 2,
+                                      top: 2,
+                                    ),
+                              padding: const EdgeInsets.all(5),
+                              child: Center(
+                                child: Stack(
+                                  children: <Widget>[
+                                    Image.asset(
+                                      pokemonImages[index],
+                                      height: 70,
+                                      width: 70,
+                                      color: colorStateOfPokemon(
+                                        snapshot.data[index].state,
+                                      ),
+                                      colorBlendMode: colorBlendStateOfPokemon(
+                                        snapshot.data[index].state,
+                                      ),
+                                    ),
+                                    if (snapshot.data[index].state == 0)
+                                      Align(
+                                        alignment: FractionalOffset.center,
+                                        child: Icon(
+                                          AntDesign.question,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                      );
+                    },
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+
+  Padding _buildTodaysTaskHeader() => Padding(
+        padding: const EdgeInsets.only(
+          top: 10,
+          bottom: 10,
+          left: 20,
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            const Text(
+              'To-do list',
+              style: TextStyle(fontFamily: 'Alata', fontSize: 20),
+            ),
+            Container(
+              width: 25,
+              height: 25,
+              margin: const EdgeInsets.only(right: 20),
+              child: RawMaterialButton(
+                fillColor: TodoColors.deepPurple,
+                shape: const CircleBorder(),
+                elevation: 2,
+                child: Icon(
+                  Icons.add,
+                  color: Colors.white,
+                ),
+                onPressed: _modalBottomSheetMenu,
+              ),
+            ),
+          ],
+        ),
+      );
+
+  Widget _buildTodayTask() => Expanded(
+        child: Consumer<TodayTaskBloc>(
+          builder: (context, bloc, child) => StreamBuilder<List<TodayTask>>(
+            initialData: const [],
+            stream: bloc.listTodayTaskStream,
+            builder: (context, snapshot) {
+              if (!snapshot.hasData) {
+                return const Center(
+                  child: Text(
+                    'Empty to-do',
+                    style: TextStyle(
+                      fontFamily: 'Alata',
+                      fontSize: 16,
+                    ),
+                  ),
+                );
+              }
+              if (snapshot.data.isEmpty) {
+                return const Center(
+                  child: Text(
+                    'Empty to-do',
+                    style: TextStyle(
+                      fontFamily: 'Alata',
+                      fontSize: 16,
+                    ),
+                  ),
+                );
+              }
+
+              return ListView.builder(
+                physics: BouncingScrollPhysics(),
+                padding: EdgeInsets.zero,
+                itemCount: snapshot.data.length,
+                itemBuilder: (context, index) => TodayTaskTile(
+                  ctx: context,
+                  task: snapshot.data[index],
+                  index: index,
+                  key: UniqueKey(),
+                ),
+              );
+            },
+          ),
+        ),
+      );
+
+  Widget _buildHabitTitle() => Padding(
+        padding: const EdgeInsets.only(
+          left: 20,
+          top: 10,
+          bottom: 10,
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            const Text(
+              'Task list',
+              style: TextStyle(fontFamily: 'Alata', fontSize: 20),
+            ),
+            const SizedBox(width: 10),
+            Container(
+              width: 25,
+              height: 25,
+              margin: const EdgeInsets.only(right: 20),
+              child: RawMaterialButton(
+                fillColor: TodoColors.deepPurple,
+                shape: const CircleBorder(),
+                elevation: 2,
+                child: Icon(
+                  Icons.add,
+                  color: Colors.white,
+                ),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => AddHabitScreen(
+                        ctx: context,
+                      ),
+                    ),
+                  );
+                },
+              ),
             ),
           ],
         ),

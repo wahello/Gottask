@@ -56,13 +56,13 @@ class _SplashScreenState extends State<SplashScreen>
                 },
                 onPageChanged: (value) {
                   setState(() {
-                    if (value == 3)
+                    if (value == 4)
                       _done = true;
                     else
                       _done = false;
                   });
                 },
-                itemCount: 4,
+                itemCount: 5,
               ),
             ),
             Flexible(
@@ -71,7 +71,7 @@ class _SplashScreenState extends State<SplashScreen>
                 child: _done == false
                     ? SmoothPageIndicator(
                         controller: controller,
-                        count: 4,
+                        count: 5,
                         effect: JumpingDotEffect(
                           activeDotColor: TodoColors.deepPurple,
                         ),

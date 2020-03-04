@@ -549,7 +549,8 @@ class _TodayTaskScreenState extends State<TodayTaskScreen>
               _stop();
             }
           },
-          child: Container(
+          child: AnimatedContainer(
+            duration: Duration(milliseconds: 200),
             margin: const EdgeInsets.only(left: 10, right: 10, top: 10),
             width: 100,
             height: 100,
@@ -561,10 +562,13 @@ class _TodayTaskScreenState extends State<TodayTaskScreen>
               ),
               borderRadius: BorderRadius.circular(3),
             ),
-            child: Icon(
-              _isRecording == false ? SimpleLineIcons.microphone : Icons.stop,
-              size: 50,
-              color: Color(int.parse(colors[indexColor])),
+            child: AnimatedContainer(
+              duration: Duration(milliseconds: 200),
+              child: Icon(
+                _isRecording == false ? SimpleLineIcons.microphone : Icons.stop,
+                size: 50,
+                color: Color(int.parse(colors[indexColor])),
+              ),
             ),
           ),
         ),
@@ -742,7 +746,8 @@ class _TodayTaskScreenState extends State<TodayTaskScreen>
         ),
       );
 
-  Container _cameraButton() => Container(
+  Widget _cameraButton() => AnimatedContainer(
+        duration: Duration(milliseconds: 200),
         margin: const EdgeInsets.all(10),
         width: 100,
         height: 100,
@@ -773,10 +778,13 @@ class _TodayTaskScreenState extends State<TodayTaskScreen>
               child: AnimatedOpacity(
                 duration: animationController.duration,
                 opacity: opacityAnimation.value,
-                child: Icon(
-                  SimpleLineIcons.camera,
-                  color: Color(int.parse(colors[indexColor])),
-                  size: 50,
+                child: AnimatedContainer(
+                  duration: Duration(milliseconds: 200),
+                  child: Icon(
+                    SimpleLineIcons.camera,
+                    color: Color(int.parse(colors[indexColor])),
+                    size: 50,
+                  ),
                 ),
               ),
             ),
@@ -815,20 +823,8 @@ class _TodayTaskScreenState extends State<TodayTaskScreen>
 
   Widget _buildAddTaskButton(
           TodayTaskBloc _todayTaskBloc, BuildContext context) =>
-      RaisedButton.icon(
-        icon: Icon(
-          AntDesign.edit,
-          color: Colors.white,
-        ),
-        label: Text(
-          'Edit to-do',
-          style: TextStyle(
-            fontFamily: 'Alata',
-            color: Colors.white,
-            fontSize: 16,
-          ),
-        ),
-        onPressed: () {
+      GestureDetector(
+        onTap: () {
           if (_isRecording == false) {
             _isEdit = true;
             String _audioPath;
@@ -857,8 +853,30 @@ class _TodayTaskScreenState extends State<TodayTaskScreen>
             showWarning(context);
           }
         },
-        color: Color(int.parse(colors[indexColor])),
-        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        child: AnimatedContainer(
+          color: Color(int.parse(colors[indexColor])),
+          duration: Duration(milliseconds: 200),
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Icon(
+                  AntDesign.edit,
+                  color: Colors.white,
+                ),
+                Text(
+                  ' Edit to-do',
+                  style: TextStyle(
+                    fontFamily: 'Alata',
+                    color: Colors.white,
+                    fontSize: 16,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       );
 
   Future showWarning(BuildContext context) => showDialog(
@@ -940,11 +958,26 @@ class _TodayTaskScreenState extends State<TodayTaskScreen>
       child: Wrap(
         children: List.generate(
           catagories.length,
-          (index) => Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(
-                color: _catagoryItems[index] == false
+          (index) => GestureDetector(
+            onTap: () {
+              setState(() {
+                _catagoryItems[index] = !_catagoryItems[index];
+              });
+            },
+            child: AnimatedContainer(
+              duration: Duration(milliseconds: 200),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(
+                  color: _catagoryItems[index] == false
+                      ? Color(
+                          int.parse(
+                            colors[indexColor],
+                          ),
+                        )
+                      : Colors.white,
+                ),
+                color: _catagoryItems[index]
                     ? Color(
                         int.parse(
                           colors[indexColor],
@@ -952,26 +985,12 @@ class _TodayTaskScreenState extends State<TodayTaskScreen>
                       )
                     : Colors.white,
               ),
-              color: _catagoryItems[index]
-                  ? Color(
-                      int.parse(
-                        colors[indexColor],
-                      ),
-                    )
-                  : Colors.white,
-            ),
-            padding: const EdgeInsets.all(8),
-            margin: const EdgeInsets.only(
-              bottom: 5,
-              right: 5,
-            ),
-            child: FittedBox(
-              child: InkWell(
-                onTap: () {
-                  setState(() {
-                    _catagoryItems[index] = !_catagoryItems[index];
-                  });
-                },
+              padding: const EdgeInsets.all(8),
+              margin: const EdgeInsets.only(
+                bottom: 5,
+                right: 5,
+              ),
+              child: FittedBox(
                 child: Row(
                   children: <Widget>[
                     Icon(

@@ -467,20 +467,72 @@ class _HabitScreenState extends State<HabitScreen> {
                 ],
               ),
             ),
-            Column(
-              children: <Widget>[
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  physics: BouncingScrollPhysics(),
-                  child: Padding(
-                    padding: const EdgeInsets.only(left: 5.0),
-                    child: Row(
-                      children: List.generate(
-                        _catagoryItems.length,
-                        (index) => Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(
+            _buildCatagories(context),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCatagories(BuildContext context) {
+    return Column(
+      children: <Widget>[
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          physics: BouncingScrollPhysics(),
+          child: Padding(
+            padding: const EdgeInsets.only(left: 5.0),
+            child: Row(
+              children: List.generate(
+                _catagoryItems.length,
+                (index) => GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      _catagoryItems[index] = !_catagoryItems[index];
+                    });
+                  },
+                  child: AnimatedContainer(
+                    duration: Duration(milliseconds: 200),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(
+                        color: _catagoryItems[index] == false
+                            ? Color(
+                                int.parse(
+                                  colors[widget.habit.color],
+                                ),
+                              )
+                            : Colors.white,
+                      ),
+                      color: _catagoryItems[index]
+                          ? Color(
+                              int.parse(
+                                colors[widget.habit.color],
+                              ),
+                            )
+                          : Colors.white,
+                    ),
+                    padding: const EdgeInsets.all(8),
+                    margin: const EdgeInsets.only(
+                      right: 5,
+                    ),
+                    child: FittedBox(
+                      child: Row(
+                        children: <Widget>[
+                          Icon(
+                            catagoryIcons[index],
+                            size: 15,
+                            color: _catagoryItems[index] == false
+                                ? Color(
+                                    int.parse(
+                                      colors[widget.habit.color],
+                                    ),
+                                  )
+                                : Colors.white,
+                          ),
+                          Text(
+                            ' ${catagories[index]}',
+                            style: TextStyle(
                               color: _catagoryItems[index] == false
                                   ? Color(
                                       int.parse(
@@ -489,130 +541,81 @@ class _HabitScreenState extends State<HabitScreen> {
                                     )
                                   : Colors.white,
                             ),
-                            color: _catagoryItems[index]
-                                ? Color(
-                                    int.parse(
-                                      colors[widget.habit.color],
-                                    ),
-                                  )
-                                : Colors.white,
                           ),
-                          padding: const EdgeInsets.all(8),
-                          margin: const EdgeInsets.only(
-                            right: 5,
-                          ),
-                          child: FittedBox(
-                            child: InkWell(
-                              onTap: () {
-                                setState(() {
-                                  _catagoryItems[index] =
-                                      !_catagoryItems[index];
-                                });
-                              },
-                              child: Row(
-                                children: <Widget>[
-                                  Icon(
-                                    catagoryIcons[index],
-                                    size: 15,
-                                    color: _catagoryItems[index] == false
-                                        ? Color(
-                                            int.parse(
-                                              colors[widget.habit.color],
-                                            ),
-                                          )
-                                        : Colors.white,
-                                  ),
-                                  Text(
-                                    ' ${catagories[index]}',
-                                    style: TextStyle(
-                                      color: _catagoryItems[index] == false
-                                          ? Color(
-                                              int.parse(
-                                                colors[widget.habit.color],
-                                              ),
-                                            )
-                                          : Colors.white,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
+                        ],
                       ),
                     ),
                   ),
                 ),
-                Container(
-                  height: 50,
-                  width: MediaQuery.of(context).size.width,
-                  margin: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-                  child: Center(
-                    child: Row(
-                      children: <Widget>[
-                        Expanded(
-                          child: Container(
-                            margin: EdgeInsets.only(right: 10),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              border: Border.all(
-                                color: Color(
-                                    int.parse(colors[widget.habit.color])),
-                                width: 1,
-                              ),
-                            ),
-                            child: TextField(
-                              focusNode: myFocusNode,
-                              decoration: InputDecoration(
-                                contentPadding: EdgeInsets.all(10),
-                                labelText: 'Achieve goal',
-                                labelStyle: TextStyle(
-                                  fontFamily: 'Alata',
-                                  color: Colors.grey,
-                                  fontSize: 16,
-                                ),
-                                border: InputBorder.none,
-                              ),
-                              controller: _achieveTextController,
-                            ),
-                          ),
+              ),
+            ),
+          ),
+        ),
+        Container(
+          height: 50,
+          width: MediaQuery.of(context).size.width,
+          margin: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+          child: Center(
+            child: Row(
+              children: <Widget>[
+                Expanded(
+                  child: Container(
+                    margin: EdgeInsets.only(right: 10),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(
+                        color: Color(int.parse(colors[widget.habit.color])),
+                        width: 1,
+                      ),
+                    ),
+                    child: TextField(
+                      focusNode: myFocusNode,
+                      decoration: InputDecoration(
+                        contentPadding: EdgeInsets.all(10),
+                        labelText: 'Achieve goal',
+                        labelStyle: TextStyle(
+                          fontFamily: 'Alata',
+                          color: Colors.grey,
+                          fontSize: 16,
                         ),
-                        GestureDetector(
-                          onTap: () {
-                            if (_achieveTextController.text != '' &&
-                                _achieveTextController != null) {
-                              FocusScope.of(context).requestFocus(FocusNode());
-                              setState(() {
-                                _achievelists.add(_achieveTextController.text
-                                    .replaceAll(RegExp(r','), ' '));
-                                _isDoneAchieve.add(false);
-                                _achieveTextController.clear();
-                              });
-                            }
-                          },
-                          child: Material(
-                            elevation: 1,
-                            color: Color(int.parse(colors[widget.habit.color])),
-                            borderRadius: BorderRadiusDirectional.circular(10),
-                            child: Container(
-                              height: 40,
-                              width: 40,
-                              child: Icon(
-                                Ionicons.ios_add,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
+                        border: InputBorder.none,
+                      ),
+                      controller: _achieveTextController,
+                    ),
+                  ),
+                ),
+                GestureDetector(
+                  onTap: () {
+                    if (_achieveTextController.text != '' &&
+                        _achieveTextController != null) {
+                      FocusScope.of(context).requestFocus(FocusNode());
+                      setState(() {
+                        _achievelists.add(_achieveTextController.text
+                            .replaceAll(RegExp(r','), ' '));
+                        _isDoneAchieve.add(false);
+                        _achieveTextController.clear();
+                      });
+                    }
+                  },
+                  child: Material(
+                    elevation: 1,
+                    color: Color(int.parse(colors[widget.habit.color])),
+                    borderRadius: BorderRadiusDirectional.circular(10),
+                    child: Container(
+                      height: 40,
+                      width: 40,
+                      child: Icon(
+                        Ionicons.ios_add,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                 ),
               ],
             ),
-          ],
+          ),
         ),
-      ),
+      ],
     );
   }
 
