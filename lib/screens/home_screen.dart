@@ -48,16 +48,6 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     _todayTaskBloc = Provider.of<TodayTaskBloc>(context);
     _habitBloc = Provider.of<HabitBloc>(context);
@@ -105,7 +95,7 @@ class _HomeScreenState extends State<HomeScreen>
                   _buildHeader(),
                   _buildPetCollection(),
                   _buildHabitTitle(),
-                  buildHabit(),
+                  _buildHabit(),
                   _buildTodaysTaskHeader(),
                 ],
               ),
@@ -117,7 +107,7 @@ class _HomeScreenState extends State<HomeScreen>
     );
   }
 
-  Consumer<HabitBloc> buildHabit() => Consumer<HabitBloc>(
+  Consumer<HabitBloc> _buildHabit() => Consumer<HabitBloc>(
         builder: (context, bloc, child) => StreamBuilder<List<Habit>>(
           initialData: [],
           stream: bloc.listHabitStream,
@@ -192,6 +182,7 @@ class _HomeScreenState extends State<HomeScreen>
                         ),
                       );
                     }
+
                     return Center(
                       child: HabitTile(
                         habit: snapshot.data[index],
@@ -242,7 +233,8 @@ class _HomeScreenState extends State<HomeScreen>
                           if (!snapshot.hasData) return Container();
                           if (snapshot.data != -1) {
                             return GestureDetector(
-                              onTap: () {
+                              onTap: () async {
+                                await compareTime();
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
@@ -278,7 +270,9 @@ class _HomeScreenState extends State<HomeScreen>
                             );
                           } else {
                             return GestureDetector(
-                              onTap: () {
+                              onTap: () async {
+                                await compareTime();
+
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
@@ -407,7 +401,9 @@ class _HomeScreenState extends State<HomeScreen>
                         itemCount: snapshot.data.length,
                         itemBuilder: (context, index) {
                           return GestureDetector(
-                            onTap: () {
+                            onTap: () async {
+                              await compareTime();
+
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
@@ -443,7 +439,7 @@ class _HomeScreenState extends State<HomeScreen>
                                       blurRadius: 0.5,
                                       spreadRadius: 0.5,
                                       color: Colors.black12,
-                                    )
+                                    ),
                                   ]),
                               margin: index < pokemonImages.length - 1
                                   ? const EdgeInsets.only(
@@ -615,8 +611,31 @@ class _HomeScreenState extends State<HomeScreen>
         ),
       );
 
+  compareTime() async {
+    DateTime _earlier;
+    if (await readTime() != null)
+      _earlier = DateTime.parse(await readTime());
+    else {
+      await setTime();
+      _earlier = DateTime.parse(await readTime());
+    }
+
+    DateTime _now = DateTime.now();
+
+    if (_earlier.year < _now.year) {
+      await resetVideoReward();
+    } else if (_earlier.month < _now.month) {
+      await resetVideoReward();
+    } else if (_earlier.day < _now.day) {
+      await resetVideoReward();
+    }
+
+    setTime();
+  }
+
   String getTimeNow() {
     DateTime _now = DateTime.now();
+
     if (_now.hour <= 12) {
       return 'Good morning,';
     } else if (_now.hour <= 17) {

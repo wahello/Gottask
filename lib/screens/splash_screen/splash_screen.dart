@@ -13,6 +13,7 @@ class _SplashScreenState extends State<SplashScreen>
     with SingleTickerProviderStateMixin {
   PageController controller = PageController(viewportFraction: 0.8);
   bool _done = false;
+  int _page = 5;
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -56,13 +57,13 @@ class _SplashScreenState extends State<SplashScreen>
                 },
                 onPageChanged: (value) {
                   setState(() {
-                    if (value == 4)
+                    if (value == _page - 1)
                       _done = true;
                     else
                       _done = false;
                   });
                 },
-                itemCount: 5,
+                itemCount: _page,
               ),
             ),
             Flexible(
@@ -71,7 +72,7 @@ class _SplashScreenState extends State<SplashScreen>
                 child: _done == false
                     ? SmoothPageIndicator(
                         controller: controller,
-                        count: 5,
+                        count: _page,
                         effect: JumpingDotEffect(
                           activeDotColor: TodoColors.deepPurple,
                         ),
@@ -79,7 +80,7 @@ class _SplashScreenState extends State<SplashScreen>
                     : Material(
                         borderRadius: BorderRadius.circular(15),
                         child: InkWell(
-                              borderRadius: BorderRadius.circular(15),
+                          borderRadius: BorderRadius.circular(15),
                           onTap: () async {
                             if (widget.isInit == null) {
                               await updateStartState();

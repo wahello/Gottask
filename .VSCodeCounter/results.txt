@@ -1,0 +1,105 @@
+Date : 2020-03-08 16:29:50
+Directory : c:\flutter\project\gottask\lib
+Total : 63 files,  10442 codes, 31 comments, 571 blanks, all 11044 lines
+
+Languages
++----------+------------+------------+------------+------------+------------+
+| language | files      | code       | comment    | blank      | total      |
++----------+------------+------------+------------+------------+------------+
+| Dart     |         63 |     10,442 |         31 |        571 |     11,044 |
++----------+------------+------------+------------+------------+------------+
+
+Directories
++-------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                                      | files      | code       | comment    | blank      | total      |
++-------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                                         |         63 |     10,442 |         31 |        571 |     11,044 |
+| base                                                                                      |          2 |         23 |          0 |          5 |         28 |
+| bloc                                                                                      |          9 |        374 |          0 |         94 |        468 |
+| components                                                                                |         10 |      1,038 |         13 |         74 |      1,125 |
+| database                                                                                  |         10 |        500 |          3 |         67 |        570 |
+| events                                                                                    |         13 |         85 |          0 |         31 |        116 |
+| events\current_pokemon                                                                    |          1 |          5 |          0 |          3 |          8 |
+| events\do_del_done                                                                        |          2 |         14 |          0 |          4 |         18 |
+| events\habit                                                                              |          3 |         22 |          0 |          6 |         28 |
+| events\pokemon_state                                                                      |          1 |          6 |          0 |          3 |          9 |
+| events\star                                                                               |          2 |         10 |          0 |          4 |         14 |
+| events\today_task                                                                         |          4 |         28 |          0 |         11 |         39 |
+| models                                                                                    |          5 |        125 |          0 |         13 |        138 |
+| screens                                                                                   |         11 |      6,622 |         15 |        217 |      6,854 |
+| screens\habit_screen                                                                      |          2 |      1,557 |          1 |         39 |      1,597 |
+| screens\option_screen                                                                     |          2 |        375 |          0 |         16 |        391 |
+| screens\pokemon_screen                                                                    |          2 |      1,895 |          0 |         50 |      1,945 |
+| screens\splash_screen                                                                     |          2 |        168 |          0 |          6 |        174 |
+| screens\todo_screen                                                                       |          2 |      1,999 |         14 |         79 |      2,092 |
++-------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++-------------------------------------------------------------------------------------------+----------+------------+------------+------------+------------+
+| filename                                                                                  | language | code       | comment    | blank      | total      |
++-------------------------------------------------------------------------------------------+----------+------------+------------+------------+------------+
+| c:\flutter\project\gottask\lib\app.dart                                                   | Dart     |         45 |          0 |          6 |         51 |
+| c:\flutter\project\gottask\lib\base\base_bloc.dart                                        | Dart     |         22 |          0 |          4 |         26 |
+| c:\flutter\project\gottask\lib\base\base_event.dart                                       | Dart     |          1 |          0 |          1 |          2 |
+| c:\flutter\project\gottask\lib\bloc\all_pokemon_bloc.dart                                 | Dart     |         35 |          0 |         10 |         45 |
+| c:\flutter\project\gottask\lib\bloc\current_pokemon_bloc.dart                             | Dart     |         32 |          0 |          9 |         41 |
+| c:\flutter\project\gottask\lib\bloc\do_del_done_habit_bloc.dart                           | Dart     |         36 |          0 |         11 |         47 |
+| c:\flutter\project\gottask\lib\bloc\do_del_done_todo_bloc.dart                            | Dart     |         37 |          0 |         10 |         47 |
+| c:\flutter\project\gottask\lib\bloc\habit_bloc.dart                                       | Dart     |         52 |          0 |         13 |         65 |
+| c:\flutter\project\gottask\lib\bloc\handside_bloc.dart                                    | Dart     |         23 |          0 |          9 |         32 |
+| c:\flutter\project\gottask\lib\bloc\pokemon_bloc.dart                                     | Dart     |         37 |          0 |         10 |         47 |
+| c:\flutter\project\gottask\lib\bloc\star_bloc.dart                                        | Dart     |         39 |          0 |          9 |         48 |
+| c:\flutter\project\gottask\lib\bloc\today_task_bloc.dart                                  | Dart     |         83 |          0 |         13 |         96 |
+| c:\flutter\project\gottask\lib\components\clip_digit.dart                                 | Dart     |         40 |          2 |          7 |         49 |
+| c:\flutter\project\gottask\lib\components\countdown_clock.dart                            | Dart     |        237 |          0 |         16 |        253 |
+| c:\flutter\project\gottask\lib\components\digit.dart                                      | Dart     |        141 |          0 |         16 |        157 |
+| c:\flutter\project\gottask\lib\components\habit_tile.dart                                 | Dart     |        121 |          0 |          8 |        129 |
+| c:\flutter\project\gottask\lib\components\image_viewer.dart                               | Dart     |         68 |          7 |          6 |         81 |
+| c:\flutter\project\gottask\lib\components\pet_tag.dart                                    | Dart     |         37 |          0 |          2 |         39 |
+| c:\flutter\project\gottask\lib\components\pet_tag_custom.dart                             | Dart     |         40 |          0 |          2 |         42 |
+| c:\flutter\project\gottask\lib\components\slide_direction.dart                            | Dart     |          4 |          0 |          1 |          5 |
+| c:\flutter\project\gottask\lib\components\today_task_tile.dart                            | Dart     |        279 |          4 |         12 |        295 |
+| c:\flutter\project\gottask\lib\components\todo_app_bar.dart                               | Dart     |         71 |          0 |          4 |         75 |
+| c:\flutter\project\gottask\lib\constant.dart                                              | Dart     |      1,620 |          0 |         62 |      1,682 |
+| c:\flutter\project\gottask\lib\database\doDelDoneHabitDatabase.dart                       | Dart     |         26 |          3 |          7 |         36 |
+| c:\flutter\project\gottask\lib\database\doDelDoneHabitTable.dart                          | Dart     |         61 |          0 |          6 |         67 |
+| c:\flutter\project\gottask\lib\database\doDelDoneTodoDatabase.dart                        | Dart     |         26 |          0 |          7 |         33 |
+| c:\flutter\project\gottask\lib\database\doDelDoneTodoTable.dart                           | Dart     |         61 |          0 |          6 |         67 |
+| c:\flutter\project\gottask\lib\database\habitDatabase.dart                                | Dart     |         25 |          0 |          6 |         31 |
+| c:\flutter\project\gottask\lib\database\habitTable.dart                                   | Dart     |        100 |          0 |          8 |        108 |
+| c:\flutter\project\gottask\lib\database\pokemonStateDatabase.dart                         | Dart     |         39 |          0 |          6 |         45 |
+| c:\flutter\project\gottask\lib\database\pokemonStateTable.dart                            | Dart     |         47 |          0 |          7 |         54 |
+| c:\flutter\project\gottask\lib\database\todayTaskDatabase.dart                            | Dart     |         25 |          0 |          6 |         31 |
+| c:\flutter\project\gottask\lib\database\todayTaskTable.dart                               | Dart     |         90 |          0 |          8 |         98 |
+| c:\flutter\project\gottask\lib\events\current_pokemon\update_favourite_pokemon_event.dart | Dart     |          5 |          0 |          3 |          8 |
+| c:\flutter\project\gottask\lib\events\do_del_done\update_dodeldone_habit_event.dart       | Dart     |          7 |          0 |          2 |          9 |
+| c:\flutter\project\gottask\lib\events\do_del_done\update_dodeldone_todo_event.dart        | Dart     |          7 |          0 |          2 |          9 |
+| c:\flutter\project\gottask\lib\events\habit\add_habit_event.dart                          | Dart     |          8 |          0 |          2 |         10 |
+| c:\flutter\project\gottask\lib\events\habit\delete_habit_event.dart                       | Dart     |          6 |          0 |          2 |          8 |
+| c:\flutter\project\gottask\lib\events\habit\update_habit_event.dart                       | Dart     |          8 |          0 |          2 |         10 |
+| c:\flutter\project\gottask\lib\events\pokemon_state\update_pokemon_state_event.dart       | Dart     |          6 |          0 |          3 |          9 |
+| c:\flutter\project\gottask\lib\events\star\add_star_event.dart                            | Dart     |          5 |          0 |          2 |          7 |
+| c:\flutter\project\gottask\lib\events\star\buy_item_event.dart                            | Dart     |          5 |          0 |          2 |          7 |
+| c:\flutter\project\gottask\lib\events\today_task\add_today_task_event.dart                | Dart     |          9 |          0 |          2 |         11 |
+| c:\flutter\project\gottask\lib\events\today_task\checked_today_task_event.dart            | Dart     |          7 |          0 |          5 |         12 |
+| c:\flutter\project\gottask\lib\events\today_task\delete_today_task_event.dart             | Dart     |          6 |          0 |          2 |          8 |
+| c:\flutter\project\gottask\lib\events\today_task\edit_today_task_event.dart               | Dart     |          6 |          0 |          2 |          8 |
+| c:\flutter\project\gottask\lib\main.dart                                                  | Dart     |         10 |          0 |          2 |         12 |
+| c:\flutter\project\gottask\lib\models\do_del_done_habit.dart                              | Dart     |         21 |          0 |          4 |         25 |
+| c:\flutter\project\gottask\lib\models\do_del_done_task.dart                               | Dart     |         21 |          0 |          3 |         24 |
+| c:\flutter\project\gottask\lib\models\habit.dart                                          | Dart     |         39 |          0 |          2 |         41 |
+| c:\flutter\project\gottask\lib\models\pokemon_state.dart                                  | Dart     |         14 |          0 |          1 |         15 |
+| c:\flutter\project\gottask\lib\models\today_task.dart                                     | Dart     |         30 |          0 |          3 |         33 |
+| c:\flutter\project\gottask\lib\screens\habit_screen\add_habit_screen.dart                 | Dart     |        631 |          0 |         13 |        644 |
+| c:\flutter\project\gottask\lib\screens\habit_screen\habit_screen.dart                     | Dart     |        926 |          1 |         26 |        953 |
+| c:\flutter\project\gottask\lib\screens\home_screen.dart                                   | Dart     |        628 |          0 |         27 |        655 |
+| c:\flutter\project\gottask\lib\screens\option_screen\about_me_screen.dart                 | Dart     |        253 |          0 |          7 |        260 |
+| c:\flutter\project\gottask\lib\screens\option_screen\setting_screen.dart                  | Dart     |        122 |          0 |          9 |        131 |
+| c:\flutter\project\gottask\lib\screens\pokemon_screen\all_pokemon_screen.dart             | Dart     |      1,295 |          0 |         36 |      1,331 |
+| c:\flutter\project\gottask\lib\screens\pokemon_screen\pokemon_info_screen.dart            | Dart     |        600 |          0 |         14 |        614 |
+| c:\flutter\project\gottask\lib\screens\splash_screen\config_screen.dart                   | Dart     |         45 |          0 |          3 |         48 |
+| c:\flutter\project\gottask\lib\screens\splash_screen\splash_screen.dart                   | Dart     |        123 |          0 |          3 |        126 |
+| c:\flutter\project\gottask\lib\screens\todo_screen\add_today_task_screen.dart             | Dart     |        969 |          8 |         42 |      1,019 |
+| c:\flutter\project\gottask\lib\screens\todo_screen\today_task_screen.dart                 | Dart     |      1,030 |          6 |         37 |      1,073 |
+| Total                                                                                     |          |     10,442 |         31 |        571 |     11,044 |
++-------------------------------------------------------------------------------------------+----------+------------+------------+------------+------------+

@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:firebase_admob/firebase_admob.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -45,7 +46,7 @@ class TodoColors {
 List<String> splashScreen = [
   'assets/splash/screen_home.jpg',
   'assets/splash/screen_add_todo.png',
-  'assets/splash/screen_habit_1.jpg',
+  'assets/splash/screen_habit.jpg',
   'assets/splash/screen_habit.png',
   'assets/splash/screen_pokemon_all.jpg',
 ];
@@ -96,7 +97,7 @@ Future<int> updateHandSide(HandSide handSide) async {
 Future<int> currentStar() async {
   final prefs = await SharedPreferences.getInstance();
   final key = 'my_star_key';
-  if (prefs.getInt(key) == null) prefs.setInt(key, 480);
+  if (prefs.getInt(key) == null) prefs.setInt(key, 0);
   final value = prefs.getInt(key);
   return value;
 }
@@ -270,15 +271,63 @@ Future<int> readHabitGiveUp() async {
   return value;
 }
 
+Future<void> setTime() async {
+  final prefs = await SharedPreferences.getInstance();
+  final key = 'my_time_open_app_key';
+  final value = DateTime.now().toString();
+  prefs.setString(key, value);
+}
+
+Future<String> readTime() async {
+  final prefs = await SharedPreferences.getInstance();
+  final key = 'my_time_open_app_key';
+  final value = prefs.getString(key);
+  return value;
+}
+
+Future<void> resetVideoReward() async {
+  final prefs = await SharedPreferences.getInstance();
+  final key = 'my_video_reward_key';
+  final value = 0;
+  prefs.setInt(key, value);
+}
+
+Future<void> updateVideoReward() async {
+  final prefs = await SharedPreferences.getInstance();
+  final key = 'my_video_reward_key';
+  final value = prefs.getInt(key) == null ? 0 : prefs.getInt(key) + 1;
+  prefs.setInt(key, value);
+}
+
+Future<int> getVideoReward() async {
+  final prefs = await SharedPreferences.getInstance();
+  final key = 'my_video_reward_key';
+  final value = prefs.getInt(key) == null ? 0 : prefs.getInt(key);
+  return value;
+}
+
+MobileAdTargetingInfo targetingInfo = MobileAdTargetingInfo(
+  keywords: <String>['Gottask', 'productive apps', 'to-do', 'note'],
+  contentUrl: 'https://www.facebook.com/profile.php?id=100013808691060',
+  childDirected: false,
+  testDevices: testDevice != null
+      ? <String>[testDevice] // Android emulators are considered test devices
+      : null,
+);
+
+bool inAllPokemon = false;
+
 const double kListViewHeight = 155;
 
 const String testDevice = 'Test-id';
 
-const String appId = 'ca-app-pub-8520565961626834~3121713860';
+const String appId = 'ca-app-pub-8520565961626834~6649996964';
 
-const String rewardAdsId = 'ca-app-pub-8520565961626834/3185308951';
+const String interstitialId = 'ca-app-pub-8520565961626834/1369750120';
 
-const String bannerId = 'ca-app-pub-8520565961626834/1972283720';
+const String bannerId = 'ca-app-pub-8520565961626834/2808677078';
+
+const String rewardId = 'ca-app-pub-8520565961626834/9794007386';
 
 List<String> icons = [
   "Icons.star_border",
@@ -1590,7 +1639,7 @@ List<Map<String, dynamic>> pokedex = [
     'Speed': '85',
     'Sp Atk': '55',
     'Sp Def': '30',
-    'height': '''?''',
+    'height': '''2' 00"''',
     'weight': '15.2 lbs',
     'category': 'Seed',
     'type': [

@@ -37,6 +37,7 @@ dependencies:
   after_layout: ^1.0.7+2
   flutter_launcher_icons: ^0.7.4
   smooth_page_indicator: ^0.1.3
+  firebase_admob: ^0.9.1+3
 
 flutter_icons:
   android: true
@@ -63,10 +64,10 @@ flutter:
     - assets/musics/level_up.mp3
     - assets/png/
     - assets/icon/icon.png
+    - assets/splash/screen_home.jpg
     - assets/splash/screen_add_todo.png
     - assets/splash/screen_habit.png
-    - assets/splash/screen_habit_1.jpg
-    - assets/splash/screen_home.jpg
+    - assets/splash/screen_habit.jpg
     - assets/splash/screen_pokemon_all.jpg
 
   fonts:

@@ -1,9 +1,11 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:after_layout/after_layout.dart';
 import 'package:audioplayers/audio_cache.dart';
-import 'package:dotted_border/dotted_border.dart';
+import 'package:firebase_admob/firebase_admob.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:gottask/bloc/all_pokemon_bloc.dart';
 import 'package:gottask/bloc/current_pokemon_bloc.dart';
@@ -14,9 +16,9 @@ import 'package:gottask/components/pet_tag_custom.dart';
 import 'package:gottask/constant.dart';
 import 'package:gottask/events/current_pokemon/update_favourite_pokemon_event.dart';
 import 'package:gottask/events/pokemon_state/update_pokemon_state_event.dart';
+import 'package:gottask/events/star/add_star_event.dart';
 import 'package:gottask/events/star/buy_item_event.dart';
 import 'package:gottask/models/pokemon_state.dart';
-import 'package:gottask/screens/option_screen/about_me_screen.dart';
 import 'package:gottask/screens/option_screen/setting_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:swipedetector/swipedetector.dart';
@@ -39,6 +41,9 @@ class _AllPokemonScreenState extends State<AllPokemonScreen>
   int _currentStarPoint = 0;
   int _favouritePokemon = 0;
   bool _isInit = false;
+  bool _isLoaded = false;
+  bool _isConnect = false;
+
   ScrollController _scrollController = FixedExtentScrollController();
   HandSide _currentHandside;
 
@@ -47,6 +52,9 @@ class _AllPokemonScreenState extends State<AllPokemonScreen>
   PokemonStateBloc _pokemonStateBloc;
   CurrentPokemonBloc _currentPokemonBloc;
   HandsideBloc _handsideBloc;
+
+  RewardedVideoAd _rewardedVideoAd = RewardedVideoAd.instance;
+  int _videoWatched = 0;
 
   Future _showBuyCheckDialog(BuildContext context) {
     return showDialog(
@@ -78,7 +86,7 @@ class _AllPokemonScreenState extends State<AllPokemonScreen>
                 ),
                 Padding(
                   padding: const EdgeInsets.symmetric(
-                    vertical: 20,
+                    vertical: 10,
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -88,7 +96,9 @@ class _AllPokemonScreenState extends State<AllPokemonScreen>
                           Navigator.pop(context);
                         },
                         child: Container(
-                          width: (MediaQuery.of(context).size.width - 120) / 2,
+                          width: MediaQuery.of(context).size.width > 200
+                              ? 130
+                              : 100,
                           margin: const EdgeInsets.only(
                             left: 10,
                           ),
@@ -140,7 +150,9 @@ class _AllPokemonScreenState extends State<AllPokemonScreen>
                           Navigator.pop(context);
                         },
                         child: Container(
-                          width: (MediaQuery.of(context).size.width - 120) / 2,
+                          width: MediaQuery.of(context).size.width > 200
+                              ? 130
+                              : 80,
                           margin: const EdgeInsets.only(
                             right: 10,
                           ),
@@ -179,9 +191,168 @@ class _AllPokemonScreenState extends State<AllPokemonScreen>
     _currentHandside = await currentHandSide();
   }
 
+  adsButton() {
+    return (_isConnect == true && _isLoaded == true)
+        ? SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.all(5.0),
+              child: GestureDetector(
+                onTap: () async {
+                  if (_videoWatched < 4) {
+                    try {
+                      final result = await InternetAddress.lookup('google.com');
+                      if (result.isNotEmpty &&
+                          result[0].rawAddress.isNotEmpty) {
+                        _rewardedVideoAd.show();
+                      }
+                    } on SocketException catch (_) {} on PlatformException catch (e) {
+                      print(e.code);
+                    }
+                  }
+                },
+                child: Material(
+                  borderRadius: BorderRadius.circular(10),
+                  color: Colors.white,
+                  elevation: 5,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 9,
+                      horizontal: 10,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        Container(
+                          padding: const EdgeInsets.all(5),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(3),
+                            color: TodoColors.scaffoldWhite,
+                          ),
+                          child: ShaderMask(
+                            shaderCallback: (rect) {
+                              return LinearGradient(
+                                tileMode: TileMode.repeated,
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                                stops: [0.1, 0.3, 1],
+                                colors: <Color>[
+                                  Colors.white,
+                                  tagColor['Flying'],
+                                  tagColor['Water'],
+                                ],
+                              ).createShader(rect);
+                            },
+                            blendMode: BlendMode.modulate,
+                            child: Text(
+                              'Ads',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                        Text(
+                          'You can watch ads for support me ^^',
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: MediaQuery.of(context).size.width / 38,
+                          ),
+                        ),
+                        ShaderMask(
+                          shaderCallback: (rect) {
+                            return LinearGradient(
+                              tileMode: TileMode.repeated,
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: <Color>[
+                                Colors.yellow,
+                                Colors.deepOrange.shade500,
+                                Colors.yellow,
+                              ],
+                            ).createShader(rect);
+                          },
+                          blendMode: BlendMode.modulate,
+                          child: Icon(
+                            Icons.play_circle_outline,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          )
+        : Container();
+  }
+
+  checkConnect() async {
+    _videoWatched = await getVideoReward();
+    try {
+      final result = await InternetAddress.lookup('google.com');
+      if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+        if (mounted)
+          setState(() {
+            _isConnect = true;
+          });
+      }
+    } on SocketException catch (_) {
+      if (mounted)
+        setState(() {
+          _isConnect = false;
+        });
+    }
+  }
+
+  rewardedVideoAdSetup() async {
+    FirebaseAdMob.instance.initialize(appId: appId);
+
+    _rewardedVideoAd.listener = (RewardedVideoAdEvent event,
+        {String rewardType, int rewardAmount}) async {
+      print('Reward video event: $event');
+
+      if (event == RewardedVideoAdEvent.rewarded) {
+        _starBloc.actEvent(
+          AddStarEvent(
+            point: rewardAmount,
+          ),
+        );
+        updateVideoReward();
+        setState(() {
+          _currentStarPoint += 10;
+          _videoWatched++;
+        });
+      }
+
+      if (event == RewardedVideoAdEvent.loaded && mounted) {
+        setState(() {
+          _isLoaded = true;
+        });
+      }
+
+      if (event == RewardedVideoAdEvent.closed && mounted) {
+        setState(() {
+          _isLoaded = false;
+        });
+        _rewardedVideoAd.load(
+          adUnitId: rewardId,
+          targetingInfo: targetingInfo,
+        );
+      }
+    };
+    
+    _rewardedVideoAd.load(
+      adUnitId: rewardId,
+      targetingInfo: targetingInfo,
+    );
+  }
+
   @override
   void initState() {
     super.initState();
+    rewardedVideoAdSetup();
     _currentPokemon = widget.currentPokemon;
   }
 
@@ -217,6 +388,7 @@ class _AllPokemonScreenState extends State<AllPokemonScreen>
       _allPokemonBloc.initAllPokemonBloc();
       _handsideBloc.initHandsideBloc();
       getCurrentHandside();
+      checkConnect();
       _currentStarPoint = currentStarPoint;
       _favouritePokemon = currentPokemon;
 
@@ -247,7 +419,8 @@ class _AllPokemonScreenState extends State<AllPokemonScreen>
                 onSwipeRight: () => Navigator.pop(context),
                 onSwipeLeft: () => Navigator.pop(context),
                 child: AnimatedContainer(
-                  duration: Duration(milliseconds: 200),
+                  duration: Duration(milliseconds: 600),
+                  curve: Curves.decelerate,
                   height: MediaQuery.of(context).size.height,
                   width: MediaQuery.of(context).size.width,
                   decoration: BoxDecoration(
@@ -270,32 +443,8 @@ class _AllPokemonScreenState extends State<AllPokemonScreen>
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children: <Widget>[
-                                  SafeArea(
-                                    child: Align(
-                                      alignment: FractionalOffset.topRight,
-                                      child: Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 15,
-                                          vertical: 20,
-                                        ),
-                                        child: GestureDetector(
-                                          child: Icon(
-                                            Feather.info,
-                                            color: Colors.black45,
-                                            size: 30,
-                                          ),
-                                          onTap: () {
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (_) => AboutMeScreen(),
-                                              ),
-                                            );
-                                          },
-                                        ),
-                                      ),
-                                    ),
-                                  ),
+                                  if (_isConnect == true && _videoWatched < 4)
+                                    adsButton(),
                                   SizedBox(
                                     height:
                                         MediaQuery.of(context).size.height / 7 -
@@ -323,8 +472,8 @@ class _AllPokemonScreenState extends State<AllPokemonScreen>
                                   Padding(
                                     padding: const EdgeInsets.only(
                                       top: 20,
-                                      left: 14,
-                                      right: 14,
+                                      left: 10,
+                                      right: 10,
                                     ),
                                     child: SizedBox(
                                       height: 56,
@@ -392,7 +541,8 @@ class _AllPokemonScreenState extends State<AllPokemonScreen>
               onSwipeRight: () => Navigator.pop(context),
               onSwipeLeft: () => Navigator.pop(context),
               child: AnimatedContainer(
-                duration: Duration(milliseconds: 200),
+                duration: Duration(milliseconds: 600),
+                curve: Curves.decelerate,
                 height: MediaQuery.of(context).size.height,
                 width: MediaQuery.of(context).size.width,
                 decoration: BoxDecoration(
@@ -414,32 +564,8 @@ class _AllPokemonScreenState extends State<AllPokemonScreen>
                               crossAxisAlignment: CrossAxisAlignment.start,
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: <Widget>[
-                                SafeArea(
-                                  child: Align(
-                                    alignment: FractionalOffset.topLeft,
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 15,
-                                        vertical: 20,
-                                      ),
-                                      child: GestureDetector(
-                                        child: Icon(
-                                          Feather.info,
-                                          color: Colors.black45,
-                                          size: 30,
-                                        ),
-                                        onTap: () {
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (_) => AboutMeScreen(),
-                                            ),
-                                          );
-                                        },
-                                      ),
-                                    ),
-                                  ),
-                                ),
+                                if (_isConnect == true && _videoWatched < 4)
+                                  adsButton(),
                                 SizedBox(
                                   height:
                                       MediaQuery.of(context).size.height / 7 -
@@ -465,8 +591,8 @@ class _AllPokemonScreenState extends State<AllPokemonScreen>
                                 Padding(
                                   padding: const EdgeInsets.only(
                                     top: 20,
-                                    left: 14,
-                                    right: 14,
+                                    left: 10,
+                                    right: 10,
                                   ),
                                   child: SizedBox(
                                     height: 56,
@@ -537,6 +663,92 @@ class _AllPokemonScreenState extends State<AllPokemonScreen>
       Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
+          const SizedBox(
+            height: 5,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: <Widget>[
+              Column(
+                children: <Widget>[
+                  Text(
+                    'Height',
+                    style: TextStyle(
+                      fontFamily: 'Alata',
+                      color: TodoColors.deepPurple,
+                      fontWeight: FontWeight.w500,
+                      fontSize: MediaQuery.of(context).size.width / 20,
+                      decoration: TextDecoration.none,
+                    ),
+                  ),
+                  Text(
+                    snapshot.data[_currentPokemon].state == 0
+                        ? '?'
+                        : pokedex[_currentPokemon]['height'],
+                    style: TextStyle(
+                      fontFamily: 'Montserrat',
+                      color: Colors.black87,
+                      fontWeight: FontWeight.w500,
+                      fontSize: MediaQuery.of(context).size.width / 25,
+                      decoration: TextDecoration.none,
+                    ),
+                  ),
+                ],
+              ),
+              Column(
+                children: <Widget>[
+                  Text(
+                    'Weight',
+                    style: TextStyle(
+                      fontFamily: 'Alata',
+                      color: TodoColors.deepPurple,
+                      fontWeight: FontWeight.w500,
+                      fontSize: MediaQuery.of(context).size.width / 20,
+                      decoration: TextDecoration.none,
+                    ),
+                  ),
+                  Text(
+                    snapshot.data[_currentPokemon].state == 0
+                        ? '?'
+                        : pokedex[_currentPokemon]['weight'],
+                    style: TextStyle(
+                      fontFamily: 'Montserrat',
+                      color: Colors.black87,
+                      fontWeight: FontWeight.w500,
+                      fontSize: MediaQuery.of(context).size.width / 25,
+                      decoration: TextDecoration.none,
+                    ),
+                  ),
+                ],
+              ),
+              Column(
+                children: <Widget>[
+                  Text(
+                    'Category',
+                    style: TextStyle(
+                      fontFamily: 'Alata',
+                      color: TodoColors.deepPurple,
+                      fontWeight: FontWeight.w500,
+                      fontSize: MediaQuery.of(context).size.width / 20,
+                      decoration: TextDecoration.none,
+                    ),
+                  ),
+                  Text(
+                    snapshot.data[_currentPokemon].state == 0
+                        ? '?'
+                        : pokedex[_currentPokemon]['category'],
+                    style: TextStyle(
+                      fontFamily: 'Montserrat',
+                      color: Colors.black87,
+                      fontWeight: FontWeight.w500,
+                      fontSize: MediaQuery.of(context).size.width / 25,
+                      decoration: TextDecoration.none,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
           Padding(
             padding: const EdgeInsets.only(left: 15),
             child: Text(
@@ -726,7 +938,7 @@ class _AllPokemonScreenState extends State<AllPokemonScreen>
                 type,
                 style: TextStyle(
                   color: Colors.black54,
-                  fontSize: 15,
+                  fontSize: MediaQuery.of(context).size.width / 30,
                   fontWeight: FontWeight.w900,
                 ),
               ),
@@ -739,7 +951,8 @@ class _AllPokemonScreenState extends State<AllPokemonScreen>
                   vertical: 5,
                   horizontal: 10,
                 ),
-                duration: Duration(milliseconds: 200),
+                duration: Duration(milliseconds: 600),
+                curve: Curves.decelerate,
                 color: Colors.white.withOpacity(0.6),
                 width: MediaQuery.of(context).size.width * 3 / 4 * 3 / 4 - 20,
                 height: 30,
@@ -749,8 +962,8 @@ class _AllPokemonScreenState extends State<AllPokemonScreen>
                   vertical: 5,
                   horizontal: 10,
                 ),
-                duration: Duration(milliseconds: 200),
-                curve: Curves.easeOutQuad,
+                duration: Duration(milliseconds: 600),
+                curve: Curves.decelerate,
                 width:
                     (MediaQuery.of(context).size.width * 3 / 4 * 3 / 4 - 20) *
                         int.parse(pokedex[_currentPokemon][type]) /
@@ -763,7 +976,8 @@ class _AllPokemonScreenState extends State<AllPokemonScreen>
                   vertical: 5,
                   horizontal: 10,
                 ),
-                duration: Duration(milliseconds: 200),
+                duration: Duration(milliseconds: 600),
+                curve: Curves.decelerate,
                 width: MediaQuery.of(context).size.width * 3 / 4 * 3 / 4 - 20,
                 height: 30,
                 child: Padding(
@@ -805,7 +1019,7 @@ class _AllPokemonScreenState extends State<AllPokemonScreen>
     );
   }
 
-  Material _buyButton() => Material(
+  Widget _buyButton() => Material(
         elevation: 4,
         color: Colors.white,
         borderRadius: BorderRadius.circular(10),
@@ -855,112 +1069,146 @@ class _AllPokemonScreenState extends State<AllPokemonScreen>
       );
 
   Flexible _buildWheelPokemon(
-      BuildContext context, AsyncSnapshot<List<PokemonState>> snapshot,
-      {bool isLeft}) {
-    return Flexible(
-      flex: 1,
-      child: Stack(
-        children: <Widget>[
-          CustomPaint(
-            painter: CurvedPainted(
-              isLeft: isLeft,
-            ),
-            child: Align(
-              alignment: FractionalOffset.center,
-              child: SizedBox(
-                height: MediaQuery.of(context).size.height * 3 / 5,
-                child: ListWheelScrollView(
-                  controller: _scrollController,
-                  physics: BouncingScrollPhysics(),
-                  offAxisFraction: isLeft ? 3.2 : -3.2,
-                  onSelectedItemChanged: (value) {
-                    setState(() {
-                      _currentPokemon = value;
-                    });
-                  },
-                  children: List.generate(
-                    pokedex.length,
-                    (index) {
-                      return Container(
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                            color: TodoColors.deepPurple,
-                            width: 2,
-                          ),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        margin: const EdgeInsets.only(
-                          bottom: 5,
-                          left: 5,
-                          right: 5,
-                        ),
-                        padding: const EdgeInsets.all(5),
-                        child: Stack(
-                          children: <Widget>[
-                            Image.asset(
-                              pokemonImages[index],
-                              height:
-                                  MediaQuery.of(context).size.width / 4 - 10,
-                              color: snapshot.data[index].state == 0
-                                  ? Colors.black54
-                                  : null,
-                              colorBlendMode: snapshot.data[index].state == 0
-                                  ? BlendMode.modulate
-                                  : null,
+          BuildContext context, AsyncSnapshot<List<PokemonState>> snapshot,
+          {bool isLeft}) =>
+      Flexible(
+        flex: 1,
+        child: Stack(
+          children: <Widget>[
+            CustomPaint(
+              painter: CurvedPainted(
+                isLeft: isLeft,
+              ),
+              child: Align(
+                alignment: FractionalOffset.center,
+                child: SizedBox(
+                  height: MediaQuery.of(context).size.height * 3 / 5,
+                  child: ListWheelScrollView(
+                    controller: _scrollController,
+                    physics: BouncingScrollPhysics(),
+                    offAxisFraction: isLeft ? 4.3 : -4.3,
+                    onSelectedItemChanged: (value) {
+                      setState(() {
+                        _currentPokemon = value;
+                      });
+                    },
+                    children: List.generate(
+                      pokedex.length,
+                      (index) {
+                        return Container(
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: TodoColors.deepPurple,
+                              width: 2,
                             ),
-                            if (snapshot.data[index].state == 0)
-                              Align(
-                                alignment: FractionalOffset.center,
-                                child: Icon(
-                                  AntDesign.question,
-                                  size: 30,
-                                  color: Colors.white,
-                                ),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          margin: EdgeInsets.symmetric(
+                            horizontal: MediaQuery.of(context).size.width / 75,
+                            vertical: MediaQuery.of(context).size.width / 200,
+                          ),
+                          padding: const EdgeInsets.all(6),
+                          child: Stack(
+                            children: <Widget>[
+                              Image.asset(
+                                pokemonImages[index],
+                                height:
+                                    MediaQuery.of(context).size.width / 4 - 10,
+                                color: snapshot.data[index].state == 0
+                                    ? Colors.black54
+                                    : null,
+                                colorBlendMode: snapshot.data[index].state == 0
+                                    ? BlendMode.modulate
+                                    : null,
                               ),
-                          ],
+                              if (snapshot.data[index].state == 0)
+                                Align(
+                                  alignment: FractionalOffset.center,
+                                  child: Icon(
+                                    AntDesign.question,
+                                    size: 30,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                    itemExtent: MediaQuery.of(context).size.width / 4,
+                  ),
+                ),
+              ),
+            ),
+            SafeArea(
+              child: Align(
+                alignment: isLeft
+                    ? FractionalOffset.bottomLeft
+                    : FractionalOffset.bottomRight,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 15,
+                    vertical: 10,
+                  ),
+                  child: GestureDetector(
+                    child: Icon(
+                      Icons.settings,
+                      color: Colors.black45,
+                      size: 30,
+                    ),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => SettingScreen(
+                            ctx: context,
+                          ),
                         ),
                       );
                     },
                   ),
-                  itemExtent: MediaQuery.of(context).size.width / 4,
                 ),
               ),
             ),
-          ),
-          SafeArea(
-            child: Align(
-              alignment: isLeft
-                  ? FractionalOffset.bottomLeft
-                  : FractionalOffset.bottomRight,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 15,
-                  vertical: 20,
-                ),
-                child: GestureDetector(
-                  child: Icon(
-                    Icons.settings,
-                    color: Colors.black45,
-                    size: 30,
-                  ),
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => SettingScreen(
-                          ctx: context,
-                        ),
+            SafeArea(
+              child: Align(
+                alignment: FractionalOffset.topCenter,
+                child: Column(
+                  children: <Widget>[
+                    Padding(
+                      padding: const EdgeInsets.only(
+                        left: 15,
+                        right: 15,
+                        top: 10,
                       ),
-                    );
-                  },
+                      child: Row(
+                        mainAxisAlignment: isLeft
+                            ? MainAxisAlignment.start
+                            : MainAxisAlignment.end,
+                        children: <Widget>[
+                          Material(
+                            child: Text(
+                              '$_currentStarPoint ',
+                              style: TextStyle(
+                                fontFamily: 'Alata',
+                                fontSize: 15,
+                              ),
+                            ),
+                          ),
+                          Image.asset(
+                            'assets/png/star.png',
+                            height: 15,
+                          )
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
-          ),
-        ],
-      ),
-    );
-  }
+          ],
+        ),
+      );
 
   Future<dynamic> _buildRefresh(BuildContext context) {
     return Future.delayed(
@@ -988,6 +1236,7 @@ class _AllPokemonScreenState extends State<AllPokemonScreen>
 
   Widget _buildFavouriteButton() {
     return Container(
+      margin: const EdgeInsets.all(3),
       child: _favouritePokemon != _currentPokemon
           ? GestureDetector(
               onTap: () {
@@ -1038,13 +1287,13 @@ class CurvedPainted extends CustomPainter {
     if (isLeft) {
       path.moveTo(0, size.height * 1 / 5 - 15);
       path.quadraticBezierTo(
-        size.width,
+        size.width + 3,
         size.height / 3.5,
-        size.width + 5,
+        size.width + 3,
         size.height / 2,
       );
       path.quadraticBezierTo(
-        size.width,
+        size.width + 3,
         size.height * (1 - 1 / 3.5),
         0,
         size.height * 4 / 5 + 15,
@@ -1052,13 +1301,13 @@ class CurvedPainted extends CustomPainter {
     } else {
       path.moveTo(size.width, size.height * 1 / 5 - 15);
       path.quadraticBezierTo(
-        0,
+        -3,
         size.height / 3.5,
-        -5,
+        -3,
         size.height / 2,
       );
       path.quadraticBezierTo(
-        0,
+        -3,
         size.height * (1 - 1 / 3.5),
         size.width,
         size.height * 4 / 5 + 15,

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_icons/flutter_icons.dart';
 import 'package:gottask/base/base_event.dart';
 import 'package:gottask/bloc/handside_bloc.dart';
 import 'package:gottask/constant.dart';
+import 'package:gottask/screens/option_screen/about_me_screen.dart';
 import 'package:provider/provider.dart';
 
 class SettingScreen extends StatefulWidget {
@@ -65,6 +67,19 @@ class _SettingScreenState extends State<SettingScreen>
           ),
         ),
         centerTitle: true,
+        actions: <Widget>[
+          IconButton(
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => AboutMeScreen(),
+              ),
+            ),
+            icon: Icon(
+              Feather.info,
+            ),
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         child: Padding(

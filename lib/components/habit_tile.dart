@@ -17,9 +17,11 @@ class HabitTile extends StatefulWidget {
 class _HabitTileState extends State<HabitTile> {
   int maxTimer;
   int starValue;
+
   @override
   void initState() {
     super.initState();
+
     var _rawTimer = widget.habit.timer.split(':');
     var _rawSecond = _rawTimer[2].split('.');
     maxTimer = int.parse(_rawTimer[0]) * 3600 +
@@ -30,7 +32,7 @@ class _HabitTileState extends State<HabitTile> {
 
   @override
   Widget build(BuildContext context) => GestureDetector(
-        onTap: () {
+        onTap: ()  {
           Navigator.push(
             context,
             MaterialPageRoute(

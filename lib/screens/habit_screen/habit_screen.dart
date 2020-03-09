@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:audioplayers/audio_cache.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:firebase_admob/firebase_admob.dart';
 import 'package:flutter_incall/flutter_incall.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -55,6 +56,21 @@ class _HabitScreenState extends State<HabitScreen> {
   AudioCache audioCache = AudioCache();
   AudioPlayer audioPlayer = AudioPlayer();
 
+  InterstitialAd myInterstitial;
+
+  InterstitialAd _interstitialAds() {
+    return InterstitialAd(
+      adUnitId: interstitialId,
+      targetingInfo: targetingInfo,
+      listener: (MobileAdEvent event) {
+        print("InterstitialAd event is $event");
+        if (event == MobileAdEvent.closed) {
+          Navigator.pop(context);
+        }
+      },
+    );
+  }
+
   _onBackPress() async {
     //Back and update data
     List<String> durTimer = widget.habit.timer.split(':');
@@ -87,8 +103,16 @@ class _HabitScreenState extends State<HabitScreen> {
         ),
       ),
     );
-    Navigator.pop(context);
-    return true;
+    try {
+      final result = await InternetAddress.lookup('google.com');
+      if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+        myInterstitial
+          ..load()
+          ..show();
+      }
+    } on SocketException catch (_) {
+      Navigator.pop(context);
+    }
   }
 
   IconData _getTimerState() {
@@ -124,6 +148,9 @@ class _HabitScreenState extends State<HabitScreen> {
   @override
   void initState() {
     super.initState();
+    FirebaseAdMob.instance.initialize(appId: appId);
+    myInterstitial = _interstitialAds();
+
     myFocusNode = FocusNode();
     var _rawCatagoryItems = widget.habit.catagories
         .substring(1, widget.habit.catagories.length - 1)
