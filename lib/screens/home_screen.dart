@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:firebase_admob/firebase_admob.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:dotted_border/dotted_border.dart';
@@ -45,6 +46,13 @@ class _HomeScreenState extends State<HomeScreen>
   void _modalBottomSheetMenu() {
     showModalBottomSheet(
         context: context, builder: (ctx) => AddTodayTaskScreen(ctx: context));
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    FirebaseAdMob.instance.initialize(appId: appId);
+    setLoadAdsInfirst(false);
   }
 
   @override

@@ -23,6 +23,8 @@ import 'package:gottask/screens/option_screen/setting_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:swipedetector/swipedetector.dart';
 
+import '../../constant.dart';
+
 class AllPokemonScreen extends StatefulWidget {
   final BuildContext ctx;
   final int currentPokemon;
@@ -41,7 +43,7 @@ class _AllPokemonScreenState extends State<AllPokemonScreen>
   int _currentStarPoint = 0;
   int _favouritePokemon = 0;
   bool _isInit = false;
-  bool _isLoaded = false;
+  bool _isLoaded = true;
   bool _isConnect = false;
 
   ScrollController _scrollController = FixedExtentScrollController();
@@ -53,7 +55,6 @@ class _AllPokemonScreenState extends State<AllPokemonScreen>
   CurrentPokemonBloc _currentPokemonBloc;
   HandsideBloc _handsideBloc;
 
-  RewardedVideoAd _rewardedVideoAd = RewardedVideoAd.instance;
   int _videoWatched = 0;
 
   Future _showBuyCheckDialog(BuildContext context) {
@@ -195,19 +196,20 @@ class _AllPokemonScreenState extends State<AllPokemonScreen>
     return (_isConnect == true && _isLoaded == true)
         ? SafeArea(
             child: Padding(
-              padding: const EdgeInsets.all(5.0),
+              padding: const EdgeInsets.only(
+                left: 5,
+                right: 5,
+                top: 10,
+              ),
               child: GestureDetector(
                 onTap: () async {
-                  if (_videoWatched < 4) {
-                    try {
-                      final result = await InternetAddress.lookup('google.com');
-                      if (result.isNotEmpty &&
-                          result[0].rawAddress.isNotEmpty) {
-                        _rewardedVideoAd.show();
-                      }
-                    } on SocketException catch (_) {} on PlatformException catch (e) {
-                      print(e.code);
+                  try {
+                    final result = await InternetAddress.lookup('google.com');
+                    if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+                      RewardedVideoAd.instance.show();
                     }
+                  } on SocketException catch (_) {} on PlatformException catch (e) {
+                    // print(e.code);
                   }
                 },
                 child: Material(
@@ -216,7 +218,7 @@ class _AllPokemonScreenState extends State<AllPokemonScreen>
                   elevation: 5,
                   child: Padding(
                     padding: const EdgeInsets.symmetric(
-                      vertical: 9,
+                      vertical: 10,
                       horizontal: 10,
                     ),
                     child: Row(
@@ -307,16 +309,15 @@ class _AllPokemonScreenState extends State<AllPokemonScreen>
   }
 
   rewardedVideoAdSetup() async {
-    FirebaseAdMob.instance.initialize(appId: appId);
-
-    _rewardedVideoAd.listener = (RewardedVideoAdEvent event,
-        {String rewardType, int rewardAmount}) async {
-      print('Reward video event: $event');
+    _isLoaded = await getLoadAdsInfirst();
+    RewardedVideoAd.instance.listener =
+        (RewardedVideoAdEvent event, {String rewardType, int rewardAmount}) {
+      // print('Reward video event: $event');
 
       if (event == RewardedVideoAdEvent.rewarded) {
         _starBloc.actEvent(
           AddStarEvent(
-            point: rewardAmount,
+            point: 5,
           ),
         );
         updateVideoReward();
@@ -326,33 +327,38 @@ class _AllPokemonScreenState extends State<AllPokemonScreen>
         });
       }
 
-      if (event == RewardedVideoAdEvent.loaded && mounted) {
-        setState(() {
-          _isLoaded = true;
-        });
+      if (event == RewardedVideoAdEvent.failedToLoad && mounted) {
+        setLoadAdsInfirst(false);
+      }
+
+      if (event == RewardedVideoAdEvent.loaded) {
+        setLoadAdsInfirst(true);
+        if (mounted)
+          setState(() {
+            _isLoaded = true;
+          });
       }
 
       if (event == RewardedVideoAdEvent.closed && mounted) {
         setState(() {
           _isLoaded = false;
         });
-        _rewardedVideoAd.load(
+        RewardedVideoAd.instance.load(
           adUnitId: rewardId,
           targetingInfo: targetingInfo,
         );
       }
     };
-    
-    _rewardedVideoAd.load(
-      adUnitId: rewardId,
-      targetingInfo: targetingInfo,
-    );
   }
 
   @override
   void initState() {
     super.initState();
     rewardedVideoAdSetup();
+    RewardedVideoAd.instance.load(
+      adUnitId: rewardId,
+      targetingInfo: targetingInfo,
+    );
     _currentPokemon = widget.currentPokemon;
   }
 
@@ -511,10 +517,6 @@ class _AllPokemonScreenState extends State<AllPokemonScreen>
                                                     int cS =
                                                         await currentStar();
                                                     if (cS >= 60) {
-                                                      print(
-                                                          MediaQuery.of(context)
-                                                              .size
-                                                              .width);
                                                       _showBuyCheckDialog(
                                                           context);
                                                     }
@@ -627,9 +629,6 @@ class _AllPokemonScreenState extends State<AllPokemonScreen>
                                                 onTap: () async {
                                                   if (await currentStar() >=
                                                       60) {
-                                                    print(MediaQuery.of(context)
-                                                        .size
-                                                        .width);
                                                     _showBuyCheckDialog(
                                                         context);
                                                   }

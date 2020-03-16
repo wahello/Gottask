@@ -63,7 +63,7 @@ class _HabitScreenState extends State<HabitScreen> {
       adUnitId: interstitialId,
       targetingInfo: targetingInfo,
       listener: (MobileAdEvent event) {
-        print("InterstitialAd event is $event");
+        // print("InterstitialAd event is $event");
         if (event == MobileAdEvent.closed) {
           Navigator.pop(context);
         }

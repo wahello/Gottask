@@ -1,3 +1,5 @@
+
+
 import 'dart:async';
 
 import 'package:firebase_admob/firebase_admob.dart';
@@ -306,6 +308,20 @@ Future<int> getVideoReward() async {
   return value;
 }
 
+Future<void> setLoadAdsInfirst(bool val) async {
+  final prefs = await SharedPreferences.getInstance();
+  final key = 'my_load_ads_in_first_key';
+  final value = prefs.getBool(key) == null ? false : val;
+  prefs.setBool(key, value);
+}
+
+Future<bool> getLoadAdsInfirst() async {
+  final prefs = await SharedPreferences.getInstance();
+  final key = 'my_load_ads_in_first_key';
+  final value = prefs.getBool(key) == null ? false : prefs.getBool(key);
+  return value;
+}
+
 MobileAdTargetingInfo targetingInfo = MobileAdTargetingInfo(
   keywords: <String>['Gottask', 'productive apps', 'to-do', 'note'],
   contentUrl: 'https://www.facebook.com/profile.php?id=100013808691060',
@@ -314,8 +330,6 @@ MobileAdTargetingInfo targetingInfo = MobileAdTargetingInfo(
       ? <String>[testDevice] // Android emulators are considered test devices
       : null,
 );
-
-bool inAllPokemon = false;
 
 const double kListViewHeight = 155;
 

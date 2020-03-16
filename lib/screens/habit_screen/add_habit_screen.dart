@@ -168,7 +168,7 @@ class _AddHabitScreenState extends State<AddHabitScreen> {
                       timer = duration;
                     },
                     mode: CupertinoTimerPickerMode.hm,
-                    minuteInterval: 1,
+                    minuteInterval: 5,
                   ),
                 ),
               ),
